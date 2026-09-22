@@ -1,0 +1,14 @@
+{
+  "limite_orcamento_mensal": 4500,
+  "custos_variaveis_padrao": {
+    "luz": 250,
+    "internet": 120,
+    "agua": 80,
+    "gas": 90,
+    "telefone_outros": 100
+  },
+  "regras_pontuacao": {
+    "bonus_dentro_do_limite": 20,
+    "penalidade_por_100_reais_acima": 10
+  }
+}
