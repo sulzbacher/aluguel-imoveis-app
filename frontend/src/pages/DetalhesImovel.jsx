@@ -1,6 +1,7 @@
 import { ArrowLeft, Calculator, MapPin, Save, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { DistanceBadge } from '../components/DistanceBadge'
 import { ObservacaoBox } from '../components/ObservacaoBox'
 import { deleteImovel, getImovel, updateImovel } from '../services/api'
 
@@ -104,6 +105,24 @@ export function DetalhesImovel() {
           <p className="text-sm text-slate-200">
             <strong>Aeroporto:</strong> {imovel.analise_geo?.distancia_aeroporto_km} km
           </p>
+          {/* Seção de Distâncias com Cores Dinâmicas */}
+          <div className="flex flex-wrap gap-2 pt-2">
+            <DistanceBadge
+              label="Divina"
+              km={imovel.analise_geo?.divina_comedia?.km}
+              tempoMin={imovel.analise_geo?.divina_comedia?.tempo_min}
+            />
+            <DistanceBadge
+              label="Mandy Studio"
+              km={imovel.analise_geo?.mandy_studio?.km}
+              tempoMin={imovel.analise_geo?.mandy_studio?.tempo_min}
+            />
+            <DistanceBadge
+              label="Andressa & Lucas"
+              km={imovel.analise_geo?.andressa_lucas?.km}
+              tempoMin={imovel.analise_geo?.andressa_lucas?.tempo_min}
+            />
+          </div>
         </div>
 
         {/* Card Pontuação */}

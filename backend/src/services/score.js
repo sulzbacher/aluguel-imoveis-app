@@ -95,6 +95,21 @@ export function calcularScoreImovel(imovel) {
   if ((imovel.estrutura?.quartos || 0) >= 3) bonusEstrutural += 10
   if ((imovel.estrutura?.vagas_garagem || 0) >= 2) bonusEstrutural += 10
 
+  // Regra de Metragem (m²)
+  const m2 = Number(imovel.estrutura?.metro_quadrado || 0)
+  if (m2 >= 100) {
+    bonusEstrutural += 15 // Imóvel bem amplo
+  } else if (m2 >= 60) {
+    bonusEstrutural += 10 // Tamanho ideal confortável
+  } else if (m2 > 0 && m2 < 39) {
+    bonusEstrutural -= 10 // Espaço apertado
+  }
+
+  // Atributos Booleanos
+  if (imovel.estrutura?.facil_telar_gatos) bonusEstrutural += 15
+  if (imovel.estrutura?.quintal_fundos) bonusEstrutural += 15
+  if ((imovel.estrutura?.vagas_garagem || 0) >= 2) bonusEstrutural += 10
+
   // 8. Penalidade Enchente
   let penalidadeGeo = 0
   if (imovel.analise_geo?.em_zona_enchente_2024) {

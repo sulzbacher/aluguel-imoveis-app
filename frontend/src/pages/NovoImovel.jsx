@@ -126,6 +126,68 @@ export function NovoImovel() {
             </div>
           </div>
 
+          {/* Estrutura: Quartos, Vagas e Metragem */}
+          <div className="grid grid-cols-3 gap-3 pt-2 border-t border-slate-700/60">
+            <div>
+              <label htmlFor="input-quartos" className="block text-xs font-semibold text-slate-300 mb-1">
+                Quartos
+              </label>
+              <input
+                id="input-quartos"
+                type="number"
+                min="1"
+                required
+                value={form.estrutura.quartos}
+                onChange={e =>
+                  setForm({
+                    ...form,
+                    estrutura: { ...form.estrutura, quartos: Number(e.target.value) },
+                  })
+                }
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="input-vagas" className="block text-xs font-semibold text-slate-300 mb-1">
+                Vagas de Garagem
+              </label>
+              <input
+                id="input-vagas"
+                type="number"
+                min="0"
+                value={form.estrutura.vagas_garagem}
+                onChange={e =>
+                  setForm({
+                    ...form,
+                    estrutura: { ...form.estrutura, vagas_garagem: Number(e.target.value) },
+                  })
+                }
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="input-metragem" className="block text-xs font-semibold text-slate-300 mb-1">
+                Área Útil (m²)
+              </label>
+              <input
+                id="input-metragem"
+                type="number"
+                min="10"
+                placeholder="Ex: 90"
+                value={form.estrutura.metro_quadrado || ''}
+                onChange={e =>
+                  setForm({
+                    ...form,
+                    estrutura: { ...form.estrutura, metro_quadrado: Number(e.target.value) },
+                  })
+                }
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100"
+              />
+            </div>
+          </div>
+
           {/* Atributos Booleanos */}
           <div className="grid grid-cols-2 gap-4 pt-3 border-t border-slate-700/60">
             <div className="flex items-center gap-2">

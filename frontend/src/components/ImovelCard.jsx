@@ -1,5 +1,6 @@
 import { Award, Cat, ExternalLink, MapPin, ShieldAlert, TreePine } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { DistanceBadge } from './DistanceBadge'
 import { Tag } from './Tag'
 
 export function ImovelCard({ imovel, posicao }) {
@@ -75,6 +76,48 @@ export function ImovelCard({ imovel, posicao }) {
             R$ {imovel.calculos?.precoTotal?.toLocaleString('pt-BR')}
           </p>
           <p className="text-xs text-slate-500 mt-0.5">Divina: {imovel.analise_geo?.distancia_divina_comedia_km} km</p>
+        </div>
+
+        {/* Seção de Distâncias com Cores Dinâmicas */}
+        <div className="flex flex-wrap gap-2 pt-2">
+          <DistanceBadge
+            label="Divina"
+            km={imovel.analise_geo?.divina_comedia?.km}
+            tempoMin={imovel.analise_geo?.divina_comedia?.tempo_min}
+          />
+          <DistanceBadge
+            label="Mandy Studio"
+            km={imovel.analise_geo?.mandy_studio?.km}
+            tempoMin={imovel.analise_geo?.mandy_studio?.tempo_min}
+          />
+          <DistanceBadge
+            label="Andressa & Lucas"
+            km={imovel.analise_geo?.andressa_lucas?.km}
+            tempoMin={imovel.analise_geo?.andressa_lucas?.tempo_min}
+          />
+        </div>
+
+        {/* Adicionar a badge de m² e quartos nas tags */}
+        <div className="flex flex-wrap gap-1.5 pt-1">
+          <Tag color="slate">{imovel.estrutura?.quartos || 0} Quartos</Tag>
+          {imovel.estrutura?.metro_quadrado > 0 && <Tag color="slate">{imovel.estrutura?.metro_quadrado} m²</Tag>}
+          {imovel.estrutura?.facil_telar_gatos && (
+            <Tag color="purple" icon={Cat}>
+              Fácil Telar
+            </Tag>
+          )}
+          {imovel.estrutura?.quintal_fundos && (
+            <Tag color="green" icon={TreePine}>
+              Quintal Fundos
+            </Tag>
+          )}
+          {imovel.analise_geo?.em_zona_enchente_2024 ? (
+            <Tag color="red" icon={ShieldAlert}>
+              Alagou em 2024
+            </Tag>
+          ) : (
+            <Tag color="blue">Sem Enchente</Tag>
+          )}
         </div>
 
         {/* Score Badge */}
