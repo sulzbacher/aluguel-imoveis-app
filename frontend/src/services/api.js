@@ -29,4 +29,9 @@ export const deleteImovel = async id => {
   return res.data
 }
 
+export const reavaliarImovel = async id => {
+  const res = await api.post(`/imoveis/${id}/reavaliar`)
+  return res.data
+}
+
 export default api

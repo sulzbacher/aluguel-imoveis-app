@@ -1,8 +1,8 @@
 {
-  "limite_orcamento_mensal": 4500,
+  "limite_orcamento_mensal": 3000,
   "custos_variaveis_padrao": {
-    "luz": 250,
-    "internet": 120,
+    "luz": 400,
+    "internet": 150,
     "agua": 80,
     "gas": 90,
     "telefone_outros": 100

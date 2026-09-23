@@ -73,9 +73,13 @@ export function ImovelCard({ imovel, posicao }) {
         <div className="text-left md:text-right">
           <p className="text-xs text-slate-400">Total Mensal</p>
           <p className="text-base font-bold text-emerald-400">
-            R$ {imovel.calculos?.precoTotal?.toLocaleString('pt-BR')}
+            R$ {imovel.calculos?.custoTotalReal?.toLocaleString('pt-BR')}
           </p>
-          <p className="text-xs text-slate-500 mt-0.5">Divina: {imovel.analise_geo?.distancia_divina_comedia_km} km</p>
+          <p className="text-xs text-slate-500 mt-0.5">
+            <strong>Divina:</strong>{' '}
+            {imovel.analise_geo?.divina_comedia?.km ?? imovel.analise_geo?.distancia_divina_comedia_km ?? 0} km
+            {imovel.analise_geo?.divina_comedia?.tempo_min && ` (~${imovel.analise_geo.divina_comedia.tempo_min} min)`}
+          </p>
         </div>
 
         {/* Seção de Distâncias com Cores Dinâmicas */}

@@ -71,6 +71,7 @@ router.post('/', async (req, res) => {
       },
       estrutura: {
         quartos: Number(body.estrutura?.quartos || 0),
+        metro_quadrado: Number(body.estrutura?.metro_quadrado || 0),
         vagas_garagem: Number(body.estrutura?.vagas_garagem || 0),
         facil_telar_gatos: Boolean(body.estrutura?.facil_telar_gatos),
         quintal_fundos: Boolean(body.estrutura?.quintal_fundos),
@@ -148,6 +149,39 @@ router.delete('/:id', (req, res) => {
   imoveis = imoveis.filter(i => i.id !== req.params.id)
   salvarImoveis(imoveis)
   res.json({ message: 'Imóvel removido com sucesso.' })
+})
+
+// POST: Reavaliar / Recalcular imóvel existente (atualiza geocodificação, distâncias e scores)
+router.post('/:id/reavaliar', async (req, res) => {
+  try {
+    const imoveis = lerImoveis()
+    const index = imoveis.findIndex(i => i.id === req.params.id)
+
+    if (index === -1) {
+      return res.status(404).json({ message: 'Imóvel não encontrado.' })
+    }
+
+    const imovelAtual = imoveis[index]
+
+    // Refaz análise geográfica (Geocoding + Distâncias + Enchente) com as regras mais recentes
+    const geoInfo = await analisarEndereco(imovelAtual.endereco || '')
+
+    const imovelReavaliado = {
+      ...imovelAtual,
+      coordenadas: geoInfo.coordenadas,
+      analise_geo: geoInfo.analise_geo,
+    }
+
+    // Recalcula a pontuação
+    const scoreData = calcularScoreImovel(imovelReavaliado)
+
+    imoveis[index] = imovelReavaliado
+    salvarImoveis(imoveis)
+
+    res.json({ ...imovelReavaliado, calculos: scoreData })
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao reavaliar imóvel', error: error.message })
+  }
 })
 
 export default router

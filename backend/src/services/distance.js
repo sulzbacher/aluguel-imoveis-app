@@ -29,48 +29,8 @@ export const PONTOS_DE_INTERESSE = {
 }
 
 /**
- * Estima o tempo de deslocamento em minutos de carro.
- * Considera velocidade média urbana (~25 km/h) e rodoviária/metropolitana (~60 km/h).
- */
-export function estimarTempoMinutos(distanciaKm, ehRegiaoMetropolitana = false) {
-  const velocidadeMedia = ehRegiaoMetropolitana ? 55 : 28 // km/h
-  const tempoHoras = distanciaKm / velocidadeMedia
-  const tempoMinutos = Math.round(tempoHoras * 60)
-  return Math.max(3, tempoMinutos) // Mínimo de 3 min
-}
-
-export function calcularDistanciasImovel(lat, lng) {
-  const distDivina = calcularDistanciaKM(
-    lat,
-    lng,
-    PONTOS_DE_INTERESSE.DIVINA_COMEDIA.lat,
-    PONTOS_DE_INTERESSE.DIVINA_COMEDIA.lng
-  )
-  const distMandy = calcularDistanciaKM(
-    lat,
-    lng,
-    PONTOS_DE_INTERESSE.MANDY_STUDIO.lat,
-    PONTOS_DE_INTERESSE.MANDY_STUDIO.lng
-  )
-  const distAndressa = calcularDistanciaKM(
-    lat,
-    lng,
-    PONTOS_DE_INTERESSE.CASA_ANDRESSA_LUCAS.lat,
-    PONTOS_DE_INTERESSE.CASA_ANDRESSA_LUCAS.lng
-  )
-  const distAero = calcularDistanciaKM(lat, lng, PONTOS_DE_INTERESSE.AEROPORTO.lat, PONTOS_DE_INTERESSE.AEROPORTO.lng)
-
-  return {
-    divina_comedia: { km: distDivina, tempo_min: estimarTempoMinutos(distDivina, false) },
-    mandy_studio: { km: distMandy, tempo_min: estimarTempoMinutos(distMandy, false) },
-    andressa_lucas: { km: distAndressa, tempo_min: estimarTempoMinutos(distAndressa, true) },
-    aeroporto: { km: distAero, tempo_min: estimarTempoMinutos(distAero, true) },
-  }
-}
-
-/**
  * Calcula a distância em Quilômetros entre dois pontos geográficos
- * utilizando a Fórmula de Haversine.
+ * utilizando a Fórmula de Haversine (linha reta).
  */
 export function calcularDistanciaKM(lat1, lon1, lat2, lon2) {
   if (!lat1 || !lon1 || !lat2 || !lon2) return 0
@@ -87,4 +47,79 @@ export function calcularDistanciaKM(lat1, lon1, lat2, lon2) {
   const distancia = R * c
 
   return parseFloat(distancia.toFixed(1))
+}
+
+/**
+ * Estima a distância real de rodagem (de carro) e o tempo em minutos.
+ * Corrige a distância em linha reta (Haversine) aplicando o fator de malha viária (~1.18x)
+ * e usa velocidades médias dinâmicas dependendo se o trajeto é urbano ou de via expressa/BR.
+ */
+export function estimarTrajetoCarro(distanciaLinhaRetaKm) {
+  if (!distanciaLinhaRetaKm || distanciaLinhaRetaKm <= 0) {
+    return { km: 0, tempo_min: 0 }
+  }
+
+  // 1. Converte distância em linha reta para trajeto real aproximado de rua/estrada (+18%)
+  const kmRodado = parseFloat((distanciaLinhaRetaKm * 1.18).toFixed(1))
+
+  // 2. Define velocidade média realista conforme a distância:
+  // - Curtas distâncias (< 6 km): Trânsito estritamente urbano (~26 km/h)
+  // - Médias distâncias (6 a 12 km): Misto de bairro e avenidas (~38 km/h)
+  // - Longas distâncias (> 12 km): Vias expressas / BR-116 / BR-448 (~60 km/h)
+  let velocidadeMediaKmH = 26
+
+  if (kmRodado > 12) {
+    velocidadeMediaKmH = 60 // Tráfego de rodovia/via rápida (BR-116/Castelo Branco)
+  } else if (kmRodado >= 6) {
+    velocidadeMediaKmH = 38 // Avenidas de fluxo rápido (Ex: Ipiranga, Bento, Carlos Gomes)
+  }
+
+  // 3. Calcula o tempo estimado em minutos
+  const tempoMinutos = Math.round((kmRodado / velocidadeMediaKmH) * 60)
+
+  return {
+    km: kmRodado,
+    tempo_min: Math.max(3, tempoMinutos), // Mínimo de 3 minutos
+  }
+}
+
+/**
+ * Calcula todas as distâncias e tempos estimados de trajeto
+ * para os locais de interesse do casal.
+ */
+export function calcularDistanciasImovel(lat, lng) {
+  const distDivinaLinhaReta = calcularDistanciaKM(
+    lat,
+    lng,
+    PONTOS_DE_INTERESSE.DIVINA_COMEDIA.lat,
+    PONTOS_DE_INTERESSE.DIVINA_COMEDIA.lng
+  )
+
+  const distMandyLinhaReta = calcularDistanciaKM(
+    lat,
+    lng,
+    PONTOS_DE_INTERESSE.MANDY_STUDIO.lat,
+    PONTOS_DE_INTERESSE.MANDY_STUDIO.lng
+  )
+
+  const distAndressaLinhaReta = calcularDistanciaKM(
+    lat,
+    lng,
+    PONTOS_DE_INTERESSE.CASA_ANDRESSA_LUCAS.lat,
+    PONTOS_DE_INTERESSE.CASA_ANDRESSA_LUCAS.lng
+  )
+
+  const distAeroLinhaReta = calcularDistanciaKM(
+    lat,
+    lng,
+    PONTOS_DE_INTERESSE.AEROPORTO.lat,
+    PONTOS_DE_INTERESSE.AEROPORTO.lng
+  )
+
+  return {
+    divina_comedia: estimarTrajetoCarro(distDivinaLinhaReta),
+    mandy_studio: estimarTrajetoCarro(distMandyLinhaReta),
+    andressa_lucas: estimarTrajetoCarro(distAndressaLinhaReta),
+    aeroporto: estimarTrajetoCarro(distAeroLinhaReta),
+  }
 }

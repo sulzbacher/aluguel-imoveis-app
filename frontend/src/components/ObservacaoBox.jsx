@@ -13,7 +13,7 @@ export function ObservacaoBox({ autor, cor, observacoes, bonusManual, onChangeOb
             <User className="w-4 h-4" />
           </span>
           <h3 className="font-semibold capitalize text-slate-200">
-            {isCaroline ? 'Anotações da Caroline' : 'Anotações do Neno'}
+            {isCaroline ? 'Anotações da Caroline' : 'Anotações do Leonardo'}
           </h3>
         </div>
         <div className="flex items-center gap-2">
