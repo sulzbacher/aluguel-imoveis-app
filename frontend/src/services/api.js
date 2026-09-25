@@ -4,6 +4,7 @@ const api = axios.create({
   baseURL: 'http://192.168.100.23:3001/api',
 })
 
+// Rotas de Imóveis
 export const getImoveis = async () => {
   const res = await api.get('/imoveis')
   return res.data
@@ -36,6 +37,22 @@ export const reavaliarImovel = async id => {
 
 export const reavaliarTodosImoveis = async () => {
   const res = await api.post('/imoveis/reavaliar-todos')
+  return res.data
+}
+
+// Rotas de Gastos
+export const getGastos = async () => {
+  const res = await api.get('/gastos')
+  return res.data
+}
+
+export const createGasto = async gastoData => {
+  const res = await api.post('/gastos', gastoData)
+  return res.data
+}
+
+export const deleteGasto = async id => {
+  const res = await api.delete(`/gastos/${id}`)
   return res.data
 }
 
