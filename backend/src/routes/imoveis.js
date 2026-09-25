@@ -184,4 +184,30 @@ router.post('/:id/reavaliar', async (req, res) => {
   }
 })
 
+// POST: Recalcular todos os imóveis cadastrados
+router.post('/reavaliar-todos', async (req, res) => {
+  try {
+    const imoveis = lerImoveis()
+
+    const imoveisAtualizados = await Promise.all(
+      imoveis.map(async imovel => {
+        // Recalcula geocodificação/distâncias se necessário e atualiza pontuação
+        const geoInfo = await analisarEndereco(imovel.endereco || '')
+        const imovelAtualizado = {
+          ...imovel,
+          coordenadas: geoInfo.coordenadas,
+          analise_geo: geoInfo.analise_geo,
+        }
+        const calculos = calcularScoreImovel(imovelAtualizado)
+        return { ...imovelAtualizado, calculos }
+      })
+    )
+
+    salvarImoveis(imoveisAtualizados)
+    res.json({ message: 'Todos os imóveis foram recalculados com sucesso!', total: imoveisAtualizados.length })
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao recalcular todos os imóveis', error: error.message })
+  }
+})
+
 export default router

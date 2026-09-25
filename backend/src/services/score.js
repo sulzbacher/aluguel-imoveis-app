@@ -38,15 +38,19 @@ function carregarConfigOrcamento() {
 export function calcularScoreImovel(imovel) {
   const config = carregarConfigOrcamento()
 
-  // 1. Custos Básicos Imobiliária
+  // 1. Custos Básicos da Imobiliária (Sem Seguro)
   const aluguel = Number(imovel.financeiro?.aluguel || 0)
   const condominio = Number(imovel.financeiro?.condominio || 0)
   const iptu = Number(imovel.financeiro?.iptu || 0)
-  const custoImobiliaria = aluguel + condominio + iptu
+  const custoImobiliariaSemSeguro = aluguel + condominio + iptu
 
-  // 2. Custos Variáveis (Padrão do JSON ou Sobrescrito no Imóvel)
+  // 2. Seguro Fiança (Margem padrão de 30% sobre o aluguel, ou valor customizado do imóvel)
+  const taxaSeguroPercentual = Number(imovel.financeiro?.taxa_seguro_fianca ?? 30)
+  const valorSeguroFianca = Math.round((aluguel * taxaSeguroPercentual) / 100)
+  const custoImobiliariaComSeguro = custoImobiliariaSemSeguro + valorSeguroFianca
+
+  // 3. Custos Variáveis do Casal (Luz, Net, Água, Gás, Tel)
   const despesasFixas = imovel.financeiro?.custos_adicionais || config.custos_variaveis_padrao
-
   const luz = Number(despesasFixas.luz ?? config.custos_variaveis_padrao.luz)
   const internet = Number(despesasFixas.internet ?? config.custos_variaveis_padrao.internet)
   const agua = Number(despesasFixas.agua ?? config.custos_variaveis_padrao.agua)
@@ -55,25 +59,23 @@ export function calcularScoreImovel(imovel) {
 
   const totalDespesasPessoais = luz + internet + agua + gas + telefone
 
-  // 3. Orçamento Total Estimado para Morar no Imóvel
-  const custoTotalReal = custoImobiliaria + totalDespesasPessoais
+  // 4. Custo Total Real Mensal (Considerando o pior cenário - Com Seguro Fiança)
+  const custoTotalComSeguro = custoImobiliariaComSeguro + totalDespesasPessoais
+  const custoTotalSemSeguro = custoImobiliariaSemSeguro + totalDespesasPessoais
 
-  // 4. Cálculo de Pontuação Financeira e Bônus/Penalidade de Limite
+  // 5. Pontuação Financeira com base no custo total com seguro
   const limite = config.limite_orcamento_mensal
   let bonusOuPenalidadeOrcamento = 0
 
-  if (custoTotalReal <= limite) {
-    // Imóvel dentro do orçamento ganha BÔNUS EXTRA!
+  if (custoTotalComSeguro <= limite) {
     bonusOuPenalidadeOrcamento = config.regras_pontuacao.bonus_dentro_do_limite
   } else {
-    // Penalidade proporcional para cada R$ 100 acima do limite
-    const excedente = custoTotalReal - limite
+    const excedente = custoTotalComSeguro - limite
     const fatorPenalidade = config.regras_pontuacao.penalidade_por_100_reais_acima
     bonusOuPenalidadeOrcamento = -Math.round((excedente / 100) * fatorPenalidade)
   }
 
-  // Pontuação Base Financeira (Escala de 0 a 100)
-  let scoreFinanceiro = 100 - Math.max(0, (custoTotalReal - limite) / 50)
+  let scoreFinanceiro = Math.max(0, 100 - Math.max(0, (custoTotalComSeguro - limite) / 50))
   scoreFinanceiro = Math.max(0, scoreFinanceiro)
 
   // 5. Módulo de Mobilidade (Distâncias)
@@ -125,11 +127,15 @@ export function calcularScoreImovel(imovel) {
     scoreBase + bonusEstrutural + bonusOuPenalidadeOrcamento - penalidadeGeo + bonusCaroline + bonusNeno
 
   return {
-    custoImobiliaria,
+    custoImobiliaria: custoImobiliariaComSeguro,
+    custoImobiliariaSemSeguro,
+    taxaSeguroPercentual,
+    valorSeguroFianca,
     totalDespesasPessoais,
-    custoTotalReal,
+    custoTotalReal: custoTotalComSeguro,
+    custoTotalSemSeguro,
     limiteOrcamento: limite,
-    dentroDoOrcamento: custoTotalReal <= limite,
+    dentroDoOrcamento: custoTotalComSeguro <= limite,
     bonusOuPenalidadeOrcamento,
     detalhesDespesas: { luz, internet, agua, gas, telefone },
     scoreBase: parseFloat(scoreBase.toFixed(1)),

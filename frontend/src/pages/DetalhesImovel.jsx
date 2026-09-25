@@ -266,10 +266,17 @@ export function DetalhesImovel() {
         <h3 className="font-semibold text-slate-200 text-sm flex items-center gap-2">
           <Calculator className="w-4 h-4 text-indigo-400" /> Como a Pontuação foi Calculada:
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs">
           <div className="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
             <span className="text-slate-400 block">Score Base</span>
             <span className="font-bold text-slate-200">{imovel.calculos?.scoreBase} pts</span>
+          </div>
+          <div className="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+            <span className="text-slate-400 block">Score Orçamento</span>
+            <span className={`font-bold ${imovel.calculos?.dentroDoOrcamento ? 'text-emerald-400' : 'text-rose-400'}`}>
+              {imovel.calculos?.dentroDoOrcamento ? '+' : ''}
+              {imovel.calculos?.bonusOuPenalidadeOrcamento} pts
+            </span>
           </div>
           <div className="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
             <span className="text-slate-400 block">Bônus Estrutura</span>
@@ -305,7 +312,7 @@ export function DetalhesImovel() {
               imovel.calculos?.dentroDoOrcamento ? 'bg-emerald-900/60 text-emerald-300' : 'bg-rose-900/60 text-rose-300'
             }`}
           >
-            {imovel.calculos?.dentroDoOrcamento ? 'Dentro do Limite (+20 pts)' : 'Acima do Limite'}
+            {imovel.calculos?.dentroDoOrcamento ? 'Dentro do Limite' : 'Acima do Limite'}
           </span>
         </div>
 

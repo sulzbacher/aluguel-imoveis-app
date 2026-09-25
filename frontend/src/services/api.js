@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:3001/api',
+  baseURL: 'http://192.168.100.23:3001/api',
 })
 
 export const getImoveis = async () => {
