@@ -34,4 +34,9 @@ export const reavaliarImovel = async id => {
   return res.data
 }
 
+export const reavaliarTodosImoveis = async () => {
+  const res = await api.post('/imoveis/reavaliar-todos')
+  return res.data
+}
+
 export default api

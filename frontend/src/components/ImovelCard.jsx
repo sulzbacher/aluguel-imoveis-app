@@ -93,16 +93,28 @@ export function ImovelCard({ imovel, posicao }) {
 
       {/* Direita: Total Mensal Estimado + Score Final */}
       <div className="flex items-center gap-6 border-t md:border-t-0 md:border-l border-slate-700/50 pt-4 md:pt-0 md:pl-6 w-full md:w-auto justify-between md:justify-end shrink-0">
-        <div className="text-left md:text-right">
-          <p className="text-xs text-slate-400 font-medium">Custo Total Est.</p>
-          <p className="text-xl font-bold text-emerald-400">
-            R$ {(imovel.calculos?.custoTotalReal || imovel.calculos?.precoTotal || 0).toLocaleString('pt-BR')}
+        <div className="text-left md:text-right space-y-0.5">
+          <p className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Total Mensal Est.</p>
+
+          {/* Valor COM Seguro Fiança (Pior Caso) */}
+          <p className="text-xl font-black text-emerald-400">
+            R$ {(imovel.calculos?.custoTotalReal || 0).toLocaleString('pt-BR')}
+            <span className="text-[10px] text-emerald-500 font-normal block">
+              c/ Seguro Fiança ({imovel.financeiro?.taxa_seguro_fianca || 30}%)
+            </span>
           </p>
-          <p className="text-[11px] text-slate-500 mt-0.5">Imobiliária + Contas</p>
+
+          {/* Valor SEM Seguro (Caso consigam Fiador) */}
+          <p className="text-xs text-slate-400 pt-0.5 border-t border-slate-700/40">
+            Sem seguro:{' '}
+            <strong className="text-slate-200">
+              R$ {(imovel.calculos?.custoTotalSemSeguro || 0).toLocaleString('pt-BR')}
+            </strong>
+          </p>
         </div>
 
         {/* Badge do Score Final */}
-        <div className="text-center min-w-[85px] bg-slate-900/80 border border-slate-700/80 p-3 rounded-xl shadow-inner">
+        <div className="text-center min-w-[85px] bg-slate-900/80 border border-slate-700/80 p-3 rounded-xl shadow-inner shrink-0">
           <span className="block text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Score</span>
           <span className="text-2xl font-black text-indigo-400">{score}</span>
         </div>

@@ -297,33 +297,51 @@ export function DetalhesImovel() {
         </div>
       </div>
 
-      {/* Card de Orçamento Real e Bônus */}
+      {/* Card de Orçamento Real (Com vs. Sem Seguro) */}
       <div
-        className={`p-4 rounded-xl border ${
+        className={`p-5 rounded-2xl border ${
           imovel.calculos?.dentroDoOrcamento
             ? 'bg-emerald-950/20 border-emerald-800/60'
             : 'bg-rose-950/20 border-rose-800/60'
         }`}
       >
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-xs text-slate-400 font-semibold uppercase">Orçamento Total Estimado</span>
+        <div className="flex justify-between items-center mb-3">
+          <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
+            Estimativa de Orçamento Mensal
+          </span>
           <span
-            className={`text-xs font-bold px-2 py-0.5 rounded ${
+            className={`text-xs font-bold px-2.5 py-1 rounded-lg ${
               imovel.calculos?.dentroDoOrcamento ? 'bg-emerald-900/60 text-emerald-300' : 'bg-rose-900/60 text-rose-300'
             }`}
           >
-            {imovel.calculos?.dentroDoOrcamento ? 'Dentro do Limite' : 'Acima do Limite'}
+            {imovel.calculos?.dentroDoOrcamento ? 'Dentro do Limite (+20 pts)' : 'Acima do Limite'}
           </span>
         </div>
 
-        <p className="text-2xl font-black text-slate-100">
-          R$ {imovel.calculos?.custoTotalReal?.toLocaleString('pt-BR')}{' '}
-          <span className="text-xs text-slate-400 font-normal">/ mês</span>
-        </p>
+        <div className="grid md:grid-cols-2 gap-4 items-baseline border-b border-slate-700/50 pb-3 mb-3">
+          <div>
+            <span className="text-xs text-slate-400 block">
+              Com Seguro Fiança ({imovel.financeiro?.taxa_seguro_fianca || 30}% sobre Aluguel)
+            </span>
+            <p className="text-2xl font-black text-emerald-400">
+              R$ {(imovel.calculos?.custoTotalReal || 0).toLocaleString('pt-BR')}{' '}
+              <span className="text-xs text-slate-400 font-normal">/ mês</span>
+            </p>
+          </div>
 
-        <p className="text-xs text-slate-400 mt-2">
-          Imobiliária: R$ {imovel.calculos?.custoImobiliaria} | Contas (Luz/Net/Água/Gás/Tel): R${' '}
-          {imovel.calculos?.totalDespesasPessoais}
+          <div>
+            <span className="text-xs text-slate-400 block">Se Conseguir Fiador (Sem Seguro)</span>
+            <p className="text-xl font-bold text-slate-200">
+              R$ {(imovel.calculos?.custoTotalSemSeguro || 0).toLocaleString('pt-BR')}{' '}
+              <span className="text-xs text-slate-400 font-normal">/ mês</span>
+            </p>
+          </div>
+        </div>
+
+        <p className="text-xs text-slate-400">
+          <strong>Discriminação dos Custos:</strong> Aluguel (R$ {imovel.financeiro?.aluguel || 0}) + Seguro Fiança (R${' '}
+          {imovel.calculos?.valorSeguroFianca || 0}) + Condomínio (R$ {imovel.financeiro?.condominio || 0}) + IPTU (R${' '}
+          {imovel.financeiro?.iptu || 0}) + Contas Pessoais (R$ {imovel.calculos?.totalDespesasPessoais || 0})
         </p>
       </div>
 

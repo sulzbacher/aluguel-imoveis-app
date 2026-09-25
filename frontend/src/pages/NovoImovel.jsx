@@ -168,6 +168,27 @@ export function NovoImovel() {
             </div>
 
             <div>
+              <label htmlFor="input-seguro" className="block text-xs font-semibold text-slate-300 mb-1">
+                Seguro Fiança (%)
+              </label>
+              <input
+                id="input-seguro"
+                type="number"
+                min="0"
+                max="50"
+                value={form.financeiro.taxa_seguro_fianca ?? 30}
+                onChange={e =>
+                  setForm({
+                    ...form,
+                    financeiro: { ...form.financeiro, taxa_seguro_fianca: Number(e.target.value) },
+                  })
+                }
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100"
+              />
+              <span className="text-[10px] text-slate-400 mt-1 block">Padrão: 30% sobre o aluguel</span>
+            </div>
+
+            <div>
               <label htmlFor="input-metragem" className="block text-xs font-semibold text-slate-300 mb-1">
                 Área Útil (m²)
               </label>

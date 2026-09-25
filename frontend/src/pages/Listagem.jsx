@@ -1,14 +1,15 @@
-import { Home, LayoutList, Plus, Table } from 'lucide-react'
+import { Home, LayoutList, Plus, RefreshCcw, Table } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ImovelCard } from '../components/ImovelCard'
 import { RankingTable } from '../components/RankingTable'
-import { getImoveis } from '../services/api'
+import { getImoveis, reavaliarTodosImoveis } from '../services/api'
 
 export function Listagem() {
   const [imoveis, setImoveis] = useState([])
   const [loading, setLoading] = useState(true)
-  const [modoVisualizacao, setModoVisualizacao] = useState('cards') // 'cards' ou 'tabela'
+  const [modoVisualizacao, setModoVisualizacao] = useState('cards')
+  const [recalculando, setRecalculando] = useState(false)
 
   useEffect(() => {
     carregarImoveis()
@@ -22,6 +23,19 @@ export function Listagem() {
       console.error('Erro ao buscar imóveis:', err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleRecalcularTodos = async () => {
+    setRecalculando(true)
+    try {
+      await reavaliarTodosImoveis()
+      await carregarImoveis()
+      alert('Todos os imóveis foram recalculados com as novas regras!')
+    } catch (err) {
+      alert(`Erro ao recalcular imóveis: ${err.message}`)
+    } finally {
+      setRecalculando(false)
     }
   }
 
@@ -99,6 +113,13 @@ export function Listagem() {
             </div>
           )}
 
+          <button
+            onClick={handleRecalcularTodos}
+            disabled={recalculando}
+            className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-4 py-2.5 rounded-xl transition shadow-lg shadow-indigo-600/20"
+          >
+            <RefreshCcw className="w-5 h-5" /> {recalculando ? 'Recalculando...' : 'Recalcular Todos'}
+          </button>
           <Link
             to="/novo"
             className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-4 py-2.5 rounded-xl transition shadow-lg shadow-indigo-600/20"
