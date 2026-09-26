@@ -10,6 +10,8 @@ const __dirname = path.dirname(__filename)
 const gastosPath = path.join(__dirname, '../../data/gastos_mensais.json')
 const rendaPath = path.join(__dirname, '../../data/renda_casal.json')
 
+import { sincronizarComGastosMensais } from './cartoes.js'
+
 function lerJSON(caminho, padrao) {
   try {
     if (fs.existsSync(caminho)) {
@@ -31,6 +33,9 @@ function salvarJSON(caminho, dados) {
 
 // GET: Retorna Gastos, Rendas e Resumo Financeiro
 router.get('/', (req, res) => {
+  // 🚀 Sincroniza as faturas dos cartões ANTES de ler o arquivo de gastos
+  sincronizarComGastosMensais()
+
   const gastos = lerJSON(gastosPath, [])
   const renda = lerJSON(rendaPath, { carol: { entradas: [] }, neno: { entradas_variaveis: [] } })
 

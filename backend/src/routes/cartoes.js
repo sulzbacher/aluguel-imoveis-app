@@ -126,7 +126,7 @@ router.delete('/compra/:id', (req, res) => {
 })
 
 // Função auxiliar: Sincroniza a fatura dos cartões com o gastos_mensais.json
-function sincronizarComGastosMensais() {
+export function sincronizarComGastosMensais() {
   const dataCartoes = lerJSON(cartoesPath, { cartoes: [], compras: [] })
   const gastos = lerJSON(gastosPath, [])
 
