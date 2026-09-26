@@ -79,7 +79,7 @@ export function GastosMensais() {
   if (loading) return <div className="text-center py-12 text-slate-400">Carregando dados financeiros...</div>
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-800/40 p-6 rounded-2xl border border-slate-700/60">
         <div>

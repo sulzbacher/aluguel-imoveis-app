@@ -2,7 +2,7 @@ import { Calendar as CalendarIcon } from 'lucide-react'
 
 export function Agenda() {
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-800/40 p-6 rounded-2xl border border-slate-700/60">
         <div>
           <h1 className="text-2xl font-black text-slate-100 flex items-center gap-2">
