@@ -1,6 +1,5 @@
-import { ArrowLeft, DollarSign, Trash2, TrendingUp, Wallet } from 'lucide-react'
+import { DollarSign, Trash2, TrendingUp, Wallet } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { createGasto, createRenda, deleteGasto, deleteRenda, getGastosERendas } from '../services/api'
 
 export function GastosMensais() {
@@ -81,11 +80,6 @@ export function GastosMensais() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
-      {/* Botão de Voltar */}
-      <Link to="/" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200">
-        <ArrowLeft className="w-4 h-4" /> Voltar para o Ranking
-      </Link>
-
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-800/40 p-6 rounded-2xl border border-slate-700/60">
         <div>
@@ -175,7 +169,7 @@ export function GastosMensais() {
             </div>
 
             <div className="space-y-2">
-              {data.renda?.neno?.entradas?.map(e => (
+              {data.renda?.neno?.entradas_variaveis?.map(e => (
                 <div key={e.id} className="flex justify-between items-center bg-slate-900/60 p-2.5 rounded-xl text-xs">
                   <div>
                     <span className="font-semibold text-slate-200 block">{e.descricao}</span>

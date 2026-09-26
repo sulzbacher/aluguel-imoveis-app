@@ -32,11 +32,11 @@ function salvarJSON(caminho, dados) {
 // GET: Retorna Gastos, Rendas e Resumo Financeiro
 router.get('/', (req, res) => {
   const gastos = lerJSON(gastosPath, [])
-  const renda = lerJSON(rendaPath, { carol: { entradas: [] }, neno: { entradas: [] } })
+  const renda = lerJSON(rendaPath, { carol: { entradas: [] }, neno: { entradas_variaveis: [] } })
 
   // Totais de Renda
   const rendaCarol = (renda.carol?.entradas || []).reduce((acc, c) => acc + Number(c.valor || 0), 0)
-  const rendaNeno = (renda.neno?.entradas || []).reduce((acc, c) => acc + Number(c.valor || 0), 0)
+  const rendaNeno = (renda.neno?.entradas_variaveis || []).reduce((acc, c) => acc + Number(c.valor || 0), 0)
   const rendaTotalCasal = rendaCarol + rendaNeno
 
   // Totais de Gastos
@@ -93,11 +93,23 @@ router.delete('/:id', (req, res) => {
 // POST: Adiciona nova entrada de renda (para Carol ou Neno)
 router.post('/renda/:pessoa', (req, res) => {
   const { pessoa } = req.params // 'carol' ou 'neno'
-  const { descricao, valor, dia, data, tipo } = req.body
-  const renda = lerJSON(rendaPath, { carol: { entradas: [] }, neno: { entradas: [] } })
+  const { descricao, valor, dia, data, data_estimada, tipo, confirmado } = req.body
+  const renda = lerJSON(rendaPath, { carol: { entradas: [] }, neno: { entradas_variaveis: [] } })
 
   if (!renda[pessoa]) {
-    renda[pessoa] = { entradas: [] }
+    renda[pessoa] = {}
+  }
+
+  const chaveEntradas = Array.isArray(renda[pessoa].entradas_variaveis)
+    ? 'entradas_variaveis'
+    : Array.isArray(renda[pessoa].entradas)
+      ? 'entradas'
+      : pessoa === 'neno'
+        ? 'entradas_variaveis'
+        : 'entradas'
+
+  if (!renda[pessoa][chaveEntradas]) {
+    renda[pessoa][chaveEntradas] = []
   }
 
   const novaEntrada = {
@@ -105,23 +117,28 @@ router.post('/renda/:pessoa', (req, res) => {
     descricao: descricao || 'Entrada Renda',
     valor: Number(valor || 0),
     dia: dia ? Number(dia) : null,
-    data: data || null,
+    data_estimada: data_estimada || data || null,
     tipo: tipo || 'Flexível / Freela',
+    confirmado: confirmado !== undefined ? Boolean(confirmado) : false,
   }
 
-  renda[pessoa].entradas.push(novaEntrada)
+  renda[pessoa][chaveEntradas].push(novaEntrada)
   salvarJSON(rendaPath, renda)
   res.status(201).json(novaEntrada)
 })
 
-// DELETE: Remove uma entrada de renda pelo ID
+// DELETE: Remove uma entrada de renda pelo ID (ou por correspondência de índice/descrição)
 router.delete('/renda/:pessoa/:id', (req, res) => {
   const { pessoa, id } = req.params
-  const renda = lerJSON(rendaPath, { carol: { entradas: [] }, neno: { entradas: [] } })
+  const renda = lerJSON(rendaPath, { carol: { entradas: [] }, neno: { entradas_variaveis: [] } })
 
-  if (renda[pessoa]?.entradas) {
-    renda[pessoa].entradas = renda[pessoa].entradas.filter(e => e.id !== id)
-    salvarJSON(rendaPath, renda)
+  if (renda[pessoa]) {
+    const chaveEntradas = Array.isArray(renda[pessoa].entradas_variaveis) ? 'entradas_variaveis' : 'entradas'
+
+    if (renda[pessoa][chaveEntradas]) {
+      renda[pessoa][chaveEntradas] = renda[pessoa][chaveEntradas].filter(e => e.id !== id && e.descricao !== id)
+      salvarJSON(rendaPath, renda)
+    }
   }
 
   res.json({ message: 'Entrada removida com sucesso!' })

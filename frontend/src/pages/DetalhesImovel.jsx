@@ -83,7 +83,7 @@ export function DetalhesImovel() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
       {/* Voltar */}
-      <Link to="/" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200">
+      <Link to="/ranking" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200">
         <ArrowLeft className="w-4 h-4" /> Voltar para o Ranking
       </Link>
 
