@@ -31,13 +31,16 @@ function salvarJSON(caminho, dados) {
   }
 }
 
-// GET: Retorna Gastos, Rendas e Resumo Financeiro
+// GET: Retorna gastos ordenados pela prioridade (1 -> 2 -> 3)
 router.get('/', (req, res) => {
   // 🚀 Sincroniza as faturas dos cartões ANTES de ler o arquivo de gastos
   sincronizarComGastosMensais()
 
   const gastos = lerJSON(gastosPath, [])
   const renda = lerJSON(rendaPath, { carol: { entradas: [] }, neno: { entradas_variaveis: [] } })
+
+  // Ordena estritamente pelo campo de prioridade
+  gastos.sort((a, b) => Number(a.prioridade || 2) - Number(b.prioridade || 2))
 
   // Totais de Renda
   const rendaCarol = (renda.carol?.entradas || []).reduce((acc, c) => acc + Number(c.valor || 0), 0)
@@ -68,9 +71,9 @@ router.get('/', (req, res) => {
   })
 })
 
-// POST: Adiciona novo gasto
+// POST: Adicionar novo gasto com prioridade
 router.post('/', (req, res) => {
-  const { descricao, categoria, valor, tipo, substituidoNaMudanca } = req.body
+  const { descricao, categoria, valor, tipo, substituidoNaMudanca, prioridade } = req.body
   const gastos = lerJSON(gastosPath, [])
 
   const novoGasto = {
@@ -80,6 +83,7 @@ router.post('/', (req, res) => {
     valor: Number(valor || 0),
     tipo: tipo || 'Fixo Pessoal',
     substituidoNaMudanca: Boolean(substituidoNaMudanca),
+    prioridade: Number(prioridade || 2),
   }
 
   gastos.push(novoGasto)

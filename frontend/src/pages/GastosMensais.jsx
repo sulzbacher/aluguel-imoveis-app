@@ -76,6 +76,35 @@ export function GastosMensais() {
     }
   }
 
+  const renderLinhaGasto = gasto => (
+    <tr key={gasto.id} className="hover:bg-slate-700/20 transition">
+      <td className="p-3.5 font-medium">{gasto.descricao}</td>
+      <td className="p-3.5 text-slate-400">{gasto.categoria}</td>
+      <td className="p-3.5">
+        {gasto.substituidoNaMudanca ? (
+          <span className="bg-amber-950/60 text-amber-300 border border-amber-700/40 px-2 py-0.5 rounded font-semibold text-[10px]">
+            Substituído (Casa Antiga)
+          </span>
+        ) : (
+          <span className="bg-slate-700/60 text-slate-300 px-2 py-0.5 rounded font-semibold text-[10px]">
+            Fixo Continua
+          </span>
+        )}
+      </td>
+      <td className="p-3.5 font-bold text-slate-100">
+        R$ {Number(gasto.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+      </td>
+      <td className="p-3.5 text-right">
+        <button
+          onClick={() => handleDeleteGasto(gasto.id)}
+          className="p-1 text-rose-400 hover:bg-rose-950/40 rounded transition"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      </td>
+    </tr>
+  )
+
   if (loading) return <div className="text-center py-12 text-slate-400">Carregando dados financeiros...</div>
 
   return (
@@ -237,7 +266,7 @@ export function GastosMensais() {
           className="bg-slate-800/40 border border-slate-700/60 p-4 rounded-2xl space-y-3"
         >
           <span className="text-xs font-bold text-slate-300 block">+ Adicionar Novo Gasto</span>
-          <div className="grid md:grid-cols-5 gap-3">
+          <div className="grid md:grid-cols-6 gap-3">
             <input
               type="text"
               placeholder="Descrição (Ex: Farmácia)"
@@ -263,6 +292,15 @@ export function GastosMensais() {
               <option value="false">Fixo Pessoal (Continua)</option>
               <option value="true">Substituído na Mudança (Casa Antiga)</option>
             </select>
+            <select
+              value={formGasto.prioridade || 2}
+              onChange={e => setFormGasto({ ...formGasto, prioridade: Number(e.target.value) })}
+              className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 font-medium"
+            >
+              <option value={1}>1 - Cartões & Dívidas Imediatas</option>
+              <option value={2}>2 - Habitação & Contas Essenciais</option>
+              <option value={3}>3 - Despesas Flexíveis / Outros</option>
+            </select>
             <button
               type="submit"
               className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-lg p-2 transition"
@@ -285,34 +323,24 @@ export function GastosMensais() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700/40 text-xs text-slate-200">
-              {data.gastos?.map(gasto => (
-                <tr key={gasto.id} className="hover:bg-slate-700/20 transition">
-                  <td className="p-3.5 font-medium">{gasto.descricao}</td>
-                  <td className="p-3.5 text-slate-400">{gasto.categoria}</td>
-                  <td className="p-3.5">
-                    {gasto.substituidoNaMudanca ? (
-                      <span className="bg-amber-950/60 text-amber-300 border border-amber-700/40 px-2 py-0.5 rounded font-semibold text-[10px]">
-                        Substituído (Casa Antiga)
-                      </span>
-                    ) : (
-                      <span className="bg-slate-700/60 text-slate-300 px-2 py-0.5 rounded font-semibold text-[10px]">
-                        Fixo Continua
-                      </span>
-                    )}
-                  </td>
-                  <td className="p-3.5 font-bold text-slate-100">
-                    R$ {Number(gasto.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </td>
-                  <td className="p-3.5 text-right">
-                    <button
-                      onClick={() => handleDeleteGasto(gasto.id)}
-                      className="p-1 text-rose-400 hover:bg-rose-950/40 rounded transition"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              <tr className="bg-slate-900/90 font-bold text-amber-400 border-t border-b border-amber-500/30 text-[11px] uppercase tracking-wider">
+                <td colSpan="5" className="px-4 py-2">
+                  💳 1. Cartões de Crédito & Dívidas Imediatas
+                </td>
+              </tr>
+              {data.gastos?.filter(g => Number(g.prioridade || 2) === 1).map(gasto => renderLinhaGasto(gasto))}
+              <tr className="bg-slate-900/90 font-bold text-indigo-400 border-t border-b border-indigo-500/30 text-[11px] uppercase tracking-wider">
+                <td colSpan="5" className="px-4 py-2">
+                  🏠 2. Contas Essenciais da Casa, Habitação & Fixos
+                </td>
+              </tr>
+              {data.gastos?.filter(g => Number(g.prioridade || 2) === 2).map(gasto => renderLinhaGasto(gasto))}
+              <tr className="bg-slate-900/90 font-bold text-slate-400 border-t border-b border-slate-700/50 text-[11px] uppercase tracking-wider">
+                <td colSpan="5" className="px-4 py-2">
+                  🛒 3. Outros Gastos & Despesas Flexíveis
+                </td>
+              </tr>
+              {data.gastos?.filter(g => Number(g.prioridade || 2) === 3).map(gasto => renderLinhaGasto(gasto))}
             </tbody>
           </table>
         </div>
