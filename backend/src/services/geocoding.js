@@ -22,36 +22,34 @@ function limparEndereco(texto) {
  */
 async function buscarCoordenadasNominatim(enderecoOriginal) {
   const limpo = limparEndereco(enderecoOriginal)
-
-  // Extrai trechos separados por vírgula (Ex: ["Rua Padre Felipe", "1580", "Parque Amador", "Esteio", "RS"])
   const partes = limpo
     .split(',')
     .map(p => p.trim())
     .filter(Boolean)
 
-  // Monta tentativas de query gradualmente mais genéricas
+  // Identifica a cidade no texto (ex: Esteio, Porto Alegre, Gravatai, Canoas)
+  // Se não encontrar, assume a cidade que estiver no final ou 'Esteio'
+  let cidade = 'Esteio'
+  if (/esteio/i.test(enderecoOriginal)) cidade = 'Esteio'
+  else if (/porto alegre/i.test(enderecoOriginal)) cidade = 'Porto Alegre'
+  else if (/gravata/i.test(enderecoOriginal)) cidade = 'Gravataí'
+  else if (/canoas/i.test(enderecoOriginal)) cidade = 'Canoas'
+  else if (partes.length >= 2) cidade = partes[partes.length - 2]
+
+  const rua = partes[0] ? partes[0].replace(/\d+/g, '').trim() : ''
+  const numero = partes.find(p => /^\d+$/.test(p)) || ''
+
+  // Monta tentativas OBRIGATORIAMENTE amarradas à cidade correta
   const tentativas = []
 
-  // 1. Tenta "Rua + Número + Cidade + Estado" (Descarta bairro/complementos no meio)
-  if (partes.length >= 3) {
-    const rua = partes[0]
-    const numero = partes.find(p => /^\d+$/.test(p)) || ''
-    const cidade = partes[partes.length - 2] || partes[partes.length - 1]
-    const estado = 'RS'
-
-    tentativas.push(`${rua} ${numero}, ${cidade}, ${estado}`)
-    tentativas.push(`${rua}, ${cidade}, ${estado}`)
+  if (rua) {
+    if (numero) {
+      tentativas.push(`${rua}, ${numero}, ${cidade}, RS`)
+    }
+    tentativas.push(`${rua}, ${cidade}, RS`)
   }
+  tentativas.push(`${limpo}`)
 
-  // 2. Tenta o texto limpo direto com vírgulas
-  tentativas.push(limpo)
-
-  // 3. Tenta apenas "Rua, Cidade" (Ex: "Rua Padre Felipe, Esteio")
-  if (partes.length > 0) {
-    tentativas.push(`${partes[0]}, Esteio, RS`)
-  }
-
-  // Remove duplicados da lista de tentativas
   const queriesUnicas = [...new Set(tentativas)]
 
   for (const query of queriesUnicas) {

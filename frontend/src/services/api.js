@@ -41,7 +41,7 @@ export const reavaliarTodosImoveis = async () => {
 }
 
 // Rotas de Gastos
-export const getGastos = async () => {
+export const getGastosERendas = async () => {
   const res = await api.get('/gastos')
   return res.data
 }
@@ -53,6 +53,16 @@ export const createGasto = async gastoData => {
 
 export const deleteGasto = async id => {
   const res = await api.delete(`/gastos/${id}`)
+  return res.data
+}
+
+export const createRenda = async (pessoa, rendaData) => {
+  const res = await api.post(`/gastos/renda/${pessoa}`, rendaData)
+  return res.data
+}
+
+export const deleteRenda = async (pessoa, id) => {
+  const res = await api.delete(`/gastos/renda/${pessoa}/${id}`)
   return res.data
 }
 

@@ -242,25 +242,6 @@ export function DetalhesImovel() {
         </div>
       </div>
 
-      {/* Mapa do Imóvel (OpenStreetMap Iframe incorporado) */}
-      {temCoordenadas && (
-        <div className="bg-slate-800/40 border border-slate-700/60 p-4 rounded-2xl space-y-2">
-          <span className="text-xs text-slate-400 font-semibold flex items-center gap-1">
-            <MapPin className="w-3.5 h-3.5 text-indigo-400" /> Localização no Mapa
-          </span>
-          <div className="w-full h-64 rounded-xl overflow-hidden border border-slate-700/80">
-            <iframe
-              title="Mapa do Imóvel"
-              width="100%"
-              height="100%"
-              frameBorder="0"
-              scrolling="no"
-              src={`https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.01}%2C${lat - 0.01}%2C${lng + 0.01}%2C${lat + 0.01}&layer=mapnik&marker=${lat}%2C${lng}`}
-            />
-          </div>
-        </div>
-      )}
-
       {/* Breakdown da Pontuação */}
       <div className="bg-slate-800/30 border border-slate-700/50 p-5 rounded-xl space-y-3">
         <h3 className="font-semibold text-slate-200 text-sm flex items-center gap-2">
@@ -295,54 +276,6 @@ export function DetalhesImovel() {
             </span>
           </div>
         </div>
-      </div>
-
-      {/* Card de Orçamento Real (Com vs. Sem Seguro) */}
-      <div
-        className={`p-5 rounded-2xl border ${
-          imovel.calculos?.dentroDoOrcamento
-            ? 'bg-emerald-950/20 border-emerald-800/60'
-            : 'bg-rose-950/20 border-rose-800/60'
-        }`}
-      >
-        <div className="flex justify-between items-center mb-3">
-          <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
-            Estimativa de Orçamento Mensal
-          </span>
-          <span
-            className={`text-xs font-bold px-2.5 py-1 rounded-lg ${
-              imovel.calculos?.dentroDoOrcamento ? 'bg-emerald-900/60 text-emerald-300' : 'bg-rose-900/60 text-rose-300'
-            }`}
-          >
-            {imovel.calculos?.dentroDoOrcamento ? 'Dentro do Limite (+20 pts)' : 'Acima do Limite'}
-          </span>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-4 items-baseline border-b border-slate-700/50 pb-3 mb-3">
-          <div>
-            <span className="text-xs text-slate-400 block">
-              Com Seguro Fiança ({imovel.financeiro?.taxa_seguro_fianca || 30}% sobre Aluguel)
-            </span>
-            <p className="text-2xl font-black text-emerald-400">
-              R$ {(imovel.calculos?.custoTotalReal || 0).toLocaleString('pt-BR')}{' '}
-              <span className="text-xs text-slate-400 font-normal">/ mês</span>
-            </p>
-          </div>
-
-          <div>
-            <span className="text-xs text-slate-400 block">Se Conseguir Fiador (Sem Seguro)</span>
-            <p className="text-xl font-bold text-slate-200">
-              R$ {(imovel.calculos?.custoTotalSemSeguro || 0).toLocaleString('pt-BR')}{' '}
-              <span className="text-xs text-slate-400 font-normal">/ mês</span>
-            </p>
-          </div>
-        </div>
-
-        <p className="text-xs text-slate-400">
-          <strong>Discriminação dos Custos:</strong> Aluguel (R$ {imovel.financeiro?.aluguel || 0}) + Seguro Fiança (R${' '}
-          {imovel.calculos?.valorSeguroFianca || 0}) + Condomínio (R$ {imovel.financeiro?.condominio || 0}) + IPTU (R${' '}
-          {imovel.financeiro?.iptu || 0}) + Contas Pessoais (R$ {imovel.calculos?.totalDespesasPessoais || 0})
-        </p>
       </div>
 
       {/* Espaço de Anotações do Casal */}
@@ -396,6 +329,85 @@ export function DetalhesImovel() {
               })
             }
           />
+        </div>
+      </div>
+
+      {/* Mapa do Imóvel (OpenStreetMap Iframe incorporado) */}
+      {temCoordenadas && (
+        <div className="bg-slate-800/40 border border-slate-700/60 p-4 rounded-2xl space-y-2">
+          <span className="text-xs text-slate-400 font-semibold flex items-center gap-1">
+            <MapPin className="w-3.5 h-3.5 text-indigo-400" /> Localização no Mapa
+          </span>
+          <div className="w-full h-34 rounded-xl overflow-hidden border border-slate-700/80">
+            <iframe
+              title="Mapa do Imóvel"
+              width="100%"
+              height="100%"
+              frameBorder="0"
+              scrolling="no"
+              src={`https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.01}%2C${lat - 0.01}%2C${lng + 0.01}%2C${lat + 0.01}&layer=mapnik&marker=${lat}%2C${lng}`}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Painel do Orçamento & Sobra Líquida Real do Casal */}
+      <div className="bg-slate-800/40 border border-slate-700/60 p-5 rounded-2xl space-y-4">
+        <div className="flex justify-between items-center border-b border-slate-700/50 pb-3">
+          <div>
+            <h3 className="font-bold text-slate-100 text-sm">Simulação de Orçamento & Saldo Livre do Casal</h3>
+            <p className="text-xs text-slate-400 mt-0.5">Cruzamento com a Planilha de Gastos e Rendas</p>
+          </div>
+          <span
+            className={`text-xs font-bold px-2.5 py-1 rounded-lg ${
+              imovel.calculos?.dentroDoOrcamento ? 'bg-emerald-900/60 text-emerald-300' : 'bg-rose-900/60 text-rose-300'
+            }`}
+          >
+            {imovel.calculos?.dentroDoOrcamento ? 'Dentro do Limite (+20 pts)' : 'Acima do Limite'}
+          </span>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-4">
+          <div className="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800">
+            <span className="text-xs text-slate-400 block">Renda Total Casal</span>
+            <span className="text-lg font-bold text-emerald-400">
+              R$ {(imovel.calculos?.rendaTotalCasal || 0).toLocaleString('pt-BR')}
+            </span>
+          </div>
+
+          <div className="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800">
+            <span className="text-xs text-slate-400 block">Gastos Fixos Pessoais</span>
+            <span className="text-lg font-bold text-slate-200">
+              R$ {(imovel.calculos?.gastosFixosContinuos || 0).toLocaleString('pt-BR')}
+            </span>
+          </div>
+
+          <div className="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800">
+            <span className="text-xs text-slate-400 block">Custo Imóvel (c/ Seguro)</span>
+            <span className="text-lg font-bold text-rose-400">
+              R$ {(imovel.calculos?.custoTotalReal || 0).toLocaleString('pt-BR')}
+            </span>
+          </div>
+        </div>
+
+        {/* Destaque do Saldo Livre */}
+        <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-800/60 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+          <div>
+            <span className="text-xs text-emerald-400 font-semibold uppercase tracking-wider block">
+              Sobra Líquida Estimada no Fim do Mês
+            </span>
+            <p className="text-2xl font-black text-slate-100 mt-0.5">
+              R$ {(imovel.calculos?.sobraLiquidaComSeguro || 0).toLocaleString('pt-BR')}{' '}
+              <span className="text-xs text-slate-400 font-normal">livres para poupança/lazer</span>
+            </p>
+          </div>
+
+          <div className="text-xs text-slate-400 text-left md:text-right border-t md:border-t-0 md:border-l border-slate-800 pt-2 md:pt-0 md:pl-4">
+            <span>Se conseguir fiador (Sem seguro):</span>
+            <p className="font-bold text-emerald-300 text-sm">
+              Sombra R$ {(imovel.calculos?.sobraLiquidaSemSeguro || 0).toLocaleString('pt-BR')}
+            </p>
+          </div>
         </div>
       </div>
     </div>
