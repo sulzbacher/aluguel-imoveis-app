@@ -6,6 +6,7 @@ import { NovoImovel } from './pages/NovoImovel'
 
 import { Navbar } from './components/Navbar'
 import { Agenda } from './pages/Agenda'
+import { Cartoes } from './pages/Cartoes'
 import { Dashboard } from './pages/Dashboard'
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
             <Route path="/novo" element={<NovoImovel />} />
             <Route path="/gastos" element={<GastosMensais />} />
             <Route path="/agenda" element={<Agenda />} />
+            <Route path="/cartoes" element={<Cartoes />} />
           </Routes>
         </main>
       </div>

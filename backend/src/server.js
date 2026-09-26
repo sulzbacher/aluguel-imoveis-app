@@ -1,6 +1,7 @@
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
+import cartoesRouter from './routes/cartoes.js'
 import gastosRouter from './routes/gastos.js'
 import imoveisRoutes from './routes/imoveis.js'
 
@@ -17,6 +18,9 @@ app.use('/api/imoveis', imoveisRoutes)
 
 // Rotas de Gastos
 app.use('/api/gastos', gastosRouter)
+
+// Rotas de Cartões
+app.use('/api/cartoes', cartoesRouter)
 
 // Rota de Healthcheck
 app.get('/api/health', (req, res) => {
