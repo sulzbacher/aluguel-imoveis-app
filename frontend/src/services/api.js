@@ -87,4 +87,15 @@ export const deleteCompra = async id => {
   return res.data
 }
 
+//Rotas pagamentos
+export const getHistoricoGastosMes = async mesAno => {
+  const res = await api.get(`/gastos/historico/${mesAno}`)
+  return res.data
+}
+
+export const toggleMarcarPago = async dados => {
+  const res = await api.post('/gastos/historico/marcar-pago', dados)
+  return res.data
+}
+
 export default api

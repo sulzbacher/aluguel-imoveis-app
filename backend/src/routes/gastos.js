@@ -9,6 +9,7 @@ const __dirname = path.dirname(__filename)
 
 const gastosPath = path.join(__dirname, '../../data/gastos_mensais.json')
 const rendaPath = path.join(__dirname, '../../data/renda_casal.json')
+const historicoPath = path.join(__dirname, '../../data/historico_pagamentos.json')
 
 import { sincronizarComGastosMensais } from './cartoes.js'
 
@@ -151,6 +152,116 @@ router.delete('/renda/:pessoa/:id', (req, res) => {
   }
 
   res.json({ message: 'Entrada removida com sucesso!' })
+})
+
+//Rotas Pagamentos
+// Helper: Garante que um mês exista no histórico. Se não existir, clona as contas mestre.
+function inicializarMesHistorico(mesAno) {
+  sincronizarComGastosMensais()
+
+  const historico = lerJSON(historicoPath, {})
+  const gastosMestre = lerJSON(gastosPath, [])
+
+  if (!historico[mesAno]) {
+    historico[mesAno] = {
+      status: 'Em Aberto',
+      contas: gastosMestre.map(gasto => ({
+        gasto_id: gasto.id,
+        descricao: gasto.descricao,
+        categoria: gasto.categoria,
+        prioridade: gasto.prioridade || 2,
+        dia_vencimento: gasto.dia_vencimento || 10,
+        tipo: gasto.tipo,
+        substituidoNaMudanca: Boolean(gasto.substituidoNaMudanca),
+        valor_previsto: Number(gasto.valor || 0),
+        valor_pago: 0,
+        pago: false,
+        data_pagamento: null,
+        pago_por: null,
+      })),
+    }
+    salvarJSON(historicoPath, historico)
+  } else {
+    // Sincroniza o valor de cartões/gastos para contas ainda não pagas no mês
+    let alterado = false
+    historico[mesAno].contas.forEach(conta => {
+      const mestre = gastosMestre.find(g => g.id === conta.gasto_id || g.descricao === conta.descricao)
+      if (mestre && !conta.pago && conta.valor_previsto !== mestre.valor) {
+        conta.valor_previsto = Number(mestre.valor || 0)
+        alterado = true
+      }
+    })
+    if (alterado) salvarJSON(historicoPath, historico)
+  }
+
+  return historico
+}
+
+// GET: Retorna gastos e histórico do mês selecionado (ex: ?mesAno=2026-10)
+router.get('/historico/:mesAno', (req, res) => {
+  const { mesAno } = req.params
+  const historico = inicializarMesHistorico(mesAno)
+  const renda = lerJSON(rendaPath, { carol: { entradas: [] }, neno: {} })
+
+  const dadosMes = historico[mesAno] || { status: 'Em Aberto', contas: [] }
+
+  // Resumos do mês
+  const totalPrevisto = dadosMes.contas.reduce((acc, c) => acc + Number(c.valor_previsto || 0), 0)
+  const totalEfetivamentePago = dadosMes.contas
+    .filter(c => c.pago)
+    .reduce((acc, c) => acc + Number(c.valor_pago || c.valor_previsto || 0), 0)
+  const totalPendente = totalPrevisto - totalEfetivamentePago
+
+  const qtdPagas = dadosMes.contas.filter(c => c.pago).length
+  const qtdTotal = dadosMes.contas.length
+
+  res.json({
+    mesAno,
+    status: dadosMes.status,
+    contas: dadosMes.contas.sort((a, b) => {
+      if (a.prioridade !== b.prioridade) return a.prioridade - b.prioridade
+      return (a.dia_vencimento || 31) - (b.dia_vencimento || 31)
+    }),
+    renda,
+    resumo: {
+      totalPrevisto: parseFloat(totalPrevisto.toFixed(2)),
+      totalEfetivamentePago: parseFloat(totalEfetivamentePago.toFixed(2)),
+      totalPendente: parseFloat(Math.max(0, totalPendente).toFixed(2)),
+      qtdPagas,
+      qtdTotal,
+      percentualConcluido: qtdTotal > 0 ? Math.round((qtdPagas / qtdTotal) * 100) : 0,
+    },
+    mesesDisponiveis: Object.keys(historico).sort().reverse(),
+  })
+})
+
+// POST: Alternar/Marcar Status de Pagamento de uma Conta
+router.post('/historico/marcar-pago', (req, res) => {
+  const { mesAno, gasto_id, pago, valor_pago, pago_por } = req.body
+  const historico = lerJSON(historicoPath, {})
+
+  if (!historico[mesAno]) {
+    return res.status(404).json({ message: 'Mês não encontrado no histórico.' })
+  }
+
+  const conta = historico[mesAno].contas.find(c => c.gasto_id === gasto_id || c.descricao === gasto_id)
+  console.log(conta)
+  if (conta) {
+    conta.pago = Boolean(pago)
+    if (conta.pago) {
+      conta.valor_pago = valor_pago !== undefined ? Number(valor_pago) : Number(conta.valor_previsto)
+      conta.data_pagamento = new Date().toISOString()
+      conta.pago_por = pago_por || 'Carol'
+    } else {
+      conta.valor_pago = 0
+      ;((conta.data_pagamento = null), (conta.pago_por = null))
+    }
+
+    salvarJSON(historicoPath, historico)
+    return res.json({ message: 'Status atualizado!', conta })
+  }
+
+  res.status(404).json({ message: 'Gasto não encontrado neste mês.' })
 })
 
 export default router
