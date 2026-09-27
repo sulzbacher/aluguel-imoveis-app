@@ -18,6 +18,7 @@ backend/data/imoveis.json
 backend/data/gastos_mensais.json
 backend/data/renda_casal.json
 backend/data/cartoes_credito.json
+backend/data/historico_pagamentos.json
 
 # Arquivos de sistema
 .DS_Store
