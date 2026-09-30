@@ -15,7 +15,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ObservacaoBox } from '../components/ObservacaoBox'
 import { Tag } from '../components/Tag'
-import { deleteImovel, getImovel, reavaliarImovel, updateImovel } from '../services/api'
+import { deleteImovel, getImovel, reavaliarImovel, updateImovel } from '../services/imoveisService'
 
 export function DetalhesImovel() {
   const { id } = useParams()

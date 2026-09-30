@@ -1,7 +1,7 @@
 import { ArrowLeft, Check, CreditCard, Edit2, Plus, ShoppingBag, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { createCompra, deleteCompra, getCartoes, updateLimiteCartao } from '../services/api'
+import { createCompra, deleteCompra, getCartoes, updateLimiteCartao } from '../services/cartoesService'
 
 export function Cartoes() {
   const [data, setData] = useState({ cartoes: [], totalFaturasGeral: 0 })

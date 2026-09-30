@@ -10,7 +10,7 @@ import {
   getCalendariosAgenda,
   getEventosAgenda,
   updateEventoAgenda,
-} from '../services/api'
+} from '../services/agendaService'
 
 import { FormCriarEvento } from '../components/Agenda/FormCriarEvento'
 import { ListaEventos } from '../components/Agenda/ListaEventos'

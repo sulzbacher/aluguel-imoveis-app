@@ -8,7 +8,7 @@ import {
   getGastosERendas,
   getHistoricoGastosMes,
   toggleMarcarPago,
-} from '../services/api'
+} from '../services/gastosService'
 
 // =============================================================================
 // 1. MINI COMPONENTE: Cabeçalho & Seletor de Mês

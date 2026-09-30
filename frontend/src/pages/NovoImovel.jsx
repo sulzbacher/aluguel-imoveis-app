@@ -1,7 +1,7 @@
 import { ArrowLeft, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { createImovel } from '../services/api'
+import { createImovel } from '../services/imoveisService'
 
 export function NovoImovel() {
   const navigate = useNavigate()

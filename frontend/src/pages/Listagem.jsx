@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ImovelCard } from '../components/ImovelCard'
 import { RankingTable } from '../components/RankingTable'
-import { getImoveis, reavaliarTodosImoveis } from '../services/api'
+import { getImoveis, reavaliarTodosImoveis } from '../services/imoveisService'
 
 export function Listagem() {
   const [imoveis, setImoveis] = useState([])

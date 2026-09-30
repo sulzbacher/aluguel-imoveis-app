@@ -1,7 +1,9 @@
 import { AlertCircle, ArrowRight, Award, Calendar, CheckCircle2, CreditCard, Wallet } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getCartoes, getGastosERendas, getHistoricoGastosMes, getImoveis } from '../services/api'
+import { getCartoes } from '../services/cartoesService'
+import { getGastosERendas, getHistoricoGastosMes } from '../services/gastosService'
+import { getImoveis } from '../services/imoveisService'
 
 export function Dashboard() {
   const [topImoveis, setTopImoveis] = useState([])
