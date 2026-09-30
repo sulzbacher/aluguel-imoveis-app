@@ -1,4 +1,4 @@
-import { Building2, Calendar, CreditCard, LayoutDashboard, Wallet } from 'lucide-react'
+import { Building2, Calendar, CreditCard, LayoutDashboard, ShoppingBag, Wallet } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
 export function Navbar() {
@@ -82,6 +82,17 @@ export function Navbar() {
           >
             <CreditCard className="w-4 h-4" />
             <span className="hidden sm:inline">Cartões de Crédito</span>
+          </Link>
+
+          <Link
+            to="/mercado"
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl font-bold text-xs transition ${
+              isActive('/mercado')
+                ? 'bg-indigo-950/80 text-indigo-300 border border-indigo-700/50'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <ShoppingBag className="w-4 h-4" /> Mercado & Dieta
           </Link>
         </nav>
       </div>

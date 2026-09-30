@@ -1,4 +1,4 @@
-import { api } from './api'
+import api from './api'
 
 // Rotas de Gastos
 export const getGastosERendas = async () => {
