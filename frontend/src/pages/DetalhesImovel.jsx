@@ -212,6 +212,12 @@ export function DetalhesImovel() {
           <span className="text-xs text-slate-400 font-medium">Distâncias Fixas & Tempo</span>
 
           <p className="text-xs text-slate-200">
+            <strong>Aeroporto:</strong>{' '}
+            {imovel.analise_geo?.aeroporto?.km ?? imovel.analise_geo?.distancia_aeroporto_km ?? 0} km
+            {imovel.analise_geo?.aeroporto?.tempo_min && ` (~${imovel.analise_geo.aeroporto.tempo_min} min)`}
+          </p>
+
+          <p className="text-xs text-slate-200">
             <strong>Divina Comédia:</strong>{' '}
             {imovel.analise_geo?.divina_comedia?.km ?? imovel.analise_geo?.distancia_divina_comedia_km ?? 0} km
             {imovel.analise_geo?.divina_comedia?.tempo_min && ` (~${imovel.analise_geo.divina_comedia.tempo_min} min)`}
@@ -225,12 +231,6 @@ export function DetalhesImovel() {
           <p className="text-xs text-slate-200">
             <strong>Andressa & Lucas:</strong> {imovel.analise_geo?.andressa_lucas?.km ?? 'N/A'} km
             {imovel.analise_geo?.andressa_lucas?.tempo_min && ` (~${imovel.analise_geo.andressa_lucas.tempo_min} min)`}
-          </p>
-
-          <p className="text-xs text-slate-200">
-            <strong>Aeroporto:</strong>{' '}
-            {imovel.analise_geo?.aeroporto?.km ?? imovel.analise_geo?.distancia_aeroporto_km ?? 0} km
-            {imovel.analise_geo?.aeroporto?.tempo_min && ` (~${imovel.analise_geo.aeroporto.tempo_min} min)`}
           </p>
         </div>
 
