@@ -9,6 +9,7 @@ import { Agenda } from './pages/Agenda'
 import { Cartoes } from './pages/Cartoes'
 import { Dashboard } from './pages/Dashboard'
 import { Mercado } from './pages/Mercado'
+import { Metas } from './pages/Metas'
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Route path="/agenda" element={<Agenda />} />
             <Route path="/cartoes" element={<Cartoes />} />
             <Route path="/mercado" element={<Mercado />} />
+            <Route path="/metas" element={<Metas />} />
           </Routes>
         </main>
       </div>
