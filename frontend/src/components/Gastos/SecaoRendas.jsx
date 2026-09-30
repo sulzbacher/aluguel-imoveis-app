@@ -1,3 +1,5 @@
+import { Trash2, TrendingUp } from 'lucide-react'
+import { useState } from 'react'
 // =============================================================================
 // 3. MINI COMPONENTE: Quadro de Rendas (Carol & Neno)
 // =============================================================================

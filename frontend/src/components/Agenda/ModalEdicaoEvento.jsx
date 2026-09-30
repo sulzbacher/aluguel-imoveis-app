@@ -1,3 +1,5 @@
+import { Edit3, X } from 'lucide-react'
+import { useState } from 'react'
 // =============================================================================
 // 5. MINI COMPONENTE: Modal para Edição Isolada
 // =============================================================================

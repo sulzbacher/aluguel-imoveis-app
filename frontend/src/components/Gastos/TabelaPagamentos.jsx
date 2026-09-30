@@ -1,3 +1,4 @@
+import { CheckSquare, Square, Trash2 } from 'lucide-react'
 // =============================================================================
 // 5. MINI COMPONENTE: Tabela Unificada de Pagamentos do Mês
 // =============================================================================

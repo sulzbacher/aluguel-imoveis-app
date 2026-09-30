@@ -36,5 +36,5 @@ app.get('/api/health', (req, res) => {
 })
 
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor backend rodando em http://localhost:${PORT}`)
+  console.log(`🚀 Servidor backend rodando em http://192.168.100.23:${PORT}`)
 })

@@ -15,7 +15,7 @@ const tokensPath = path.join(__dirname, '../../data/google_tokens.json')
 // Suba estas variáveis para o seu .env
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET
-const REDIRECT_URI = 'http://localhost:3001/api/agenda/callback'
+const REDIRECT_URI = 'http://192.168.100.23:3001/api/agenda/callback'
 
 if (!CLIENT_ID || !CLIENT_SECRET) {
   console.error('❌ ERRO: GOOGLE_CLIENT_ID ou GOOGLE_CLIENT_SECRET não foram carregados do .env!')
@@ -59,7 +59,7 @@ router.get('/callback', async (req, res) => {
     const { tokens } = await oauth2Client.getToken(code)
     oauth2Client.setCredentials(tokens)
     salvarTokens(tokens)
-    res.redirect('http://localhost:5173/agenda?conectado=true')
+    res.redirect('http://192.168.100.23:5173/agenda?conectado=true')
   } catch (err) {
     res.status(500).send('Erro na autenticação com o Google Agenda.')
   }

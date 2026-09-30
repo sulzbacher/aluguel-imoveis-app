@@ -1,3 +1,5 @@
+import { Plus } from 'lucide-react'
+import { useState } from 'react'
 // =============================================================================
 // 4. MINI COMPONENTE: Form Apenas para Criação de Evento
 // =============================================================================

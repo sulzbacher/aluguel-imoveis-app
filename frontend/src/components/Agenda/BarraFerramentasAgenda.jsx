@@ -1,3 +1,4 @@
+import { LayoutGrid, List } from 'lucide-react'
 // =============================================================================
 // 2. MINI COMPONENTE: Seletor de Agenda & Modos de Visualização
 // =============================================================================
