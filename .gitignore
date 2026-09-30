@@ -22,7 +22,7 @@ backend/data/renda_casal.json
 backend/data/cartoes_credito.json
 backend/data/historico_pagamentos.json
 backend/data/google_tokens.json
-backend/data/planejador_mercado.json
+backend/data/dieta_mercado.json
 
 # Arquivos de sistema
 .DS_Store

@@ -1,3 +1,5 @@
+import { api } from './api'
+
 // Rotas de Cartões
 export const getCartoes = async () => {
   const res = await api.get('/cartoes')

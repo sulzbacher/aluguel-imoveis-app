@@ -1,3 +1,5 @@
+import { api } from './api'
+
 //Rotas Agenda
 export const getAuthUrlGoogle = async () => {
   const res = await api.get('/agenda/auth-url')

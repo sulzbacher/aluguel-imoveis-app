@@ -5,6 +5,7 @@ import agendaRouter from './routes/agenda.js'
 import cartoesRouter from './routes/cartoes.js'
 import gastosRouter from './routes/gastos.js'
 import imoveisRoutes from './routes/imoveis.js'
+import mercadoRouter from './routes/mercado.js'
 
 dotenv.config()
 
@@ -25,6 +26,9 @@ app.use('/api/cartoes', cartoesRouter)
 
 // Rotas de Agenda
 app.use('/api/agenda', agendaRouter)
+
+// Rotas de Mercado
+app.use('/api/mercado', mercadoRouter)
 
 // Rota de Healthcheck
 app.get('/api/health', (req, res) => {

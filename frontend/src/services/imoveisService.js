@@ -1,3 +1,5 @@
+import { api } from './api'
+
 // Rotas de Imóveis
 export const getImoveis = async () => {
   const res = await api.get('/imoveis')
