@@ -98,7 +98,7 @@ export function ImovelCard({ imovel, posicao }) {
 
           {/* Valor COM Seguro Fiança (Pior Caso) */}
           <p className="text-xl font-black text-emerald-400">
-            R$ {(imovel.calculos?.custoTotalReal || 0).toLocaleString('pt-BR')}
+            R$ {(imovel.calculos?.custoImobiliaria || 0).toLocaleString('pt-BR')}
             <span className="text-[10px] text-emerald-500 font-normal block">
               c/ Seguro Fiança ({imovel.financeiro?.taxa_seguro_fianca || 30}%)
             </span>
@@ -108,7 +108,7 @@ export function ImovelCard({ imovel, posicao }) {
           <p className="text-xs text-slate-400 pt-0.5 border-t border-slate-700/40">
             Sem seguro:{' '}
             <strong className="text-slate-200">
-              R$ {(imovel.calculos?.custoTotalSemSeguro || 0).toLocaleString('pt-BR')}
+              R$ {(imovel.calculos?.custoImobiliariaSemSeguro || 0).toLocaleString('pt-BR')}
             </strong>
           </p>
         </div>

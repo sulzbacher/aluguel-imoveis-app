@@ -177,7 +177,7 @@ export function calcularScoreImovel(imovel) {
   const sobraLiquidaSemSeguro = rendaTotalCasal - gastosFixosContinuos - custos.custoTotalSemSeguro
 
   // 4. Módulo Financeiro
-  const finScore = calcularScoreFinanceiro(custos.custoTotalComSeguro, config)
+  const finScore = calcularScoreFinanceiro(custos.custoImobiliariaComSeguro, config)
 
   // 5. Módulo Mobilidade
   const mobScore = calcularScoreMobilidade(imovel.analise_geo)
