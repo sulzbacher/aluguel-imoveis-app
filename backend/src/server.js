@@ -39,6 +39,6 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend rodando perfeitamente!' })
 })
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor backend rodando em http://192.168.100.23:${PORT}`)
 })
