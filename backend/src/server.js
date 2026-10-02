@@ -2,6 +2,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
 import agendaRouter from './routes/agenda.js'
+import auditoriaRouter from './routes/auditoria.js'
 import cartoesRouter from './routes/cartoes.js'
 import gastosRouter from './routes/gastos.js'
 import imoveisRoutes from './routes/imoveis.js'
@@ -33,6 +34,9 @@ app.use('/api/mercado', mercadoRouter)
 
 // Rotas de Metas
 app.use('/api/metas', metasRouter)
+
+// Rotas de Auditoria
+app.use('/api/auditoria', auditoriaRouter)
 
 // Rota de Healthcheck
 app.get('/api/health', (req, res) => {
