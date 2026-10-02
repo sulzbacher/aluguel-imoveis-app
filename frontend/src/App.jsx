@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { DetalhesImovel } from './pages/DetalhesImovel'
 import { GastosMensais } from './pages/GastosMensais'
-import { Listagem } from './pages/Listagem'
+import { ListagemImoveis } from './pages/ListagemImoveis'
 import { NovoImovel } from './pages/NovoImovel'
 
 import { Navbar } from './components/Navbar'
@@ -22,7 +22,7 @@ function App() {
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/ranking" element={<Listagem />} />
+            <Route path="/imoveis" element={<ListagemImoveis />} />
             <Route path="/imovel/:id" element={<DetalhesImovel />} />
             <Route path="/novo" element={<NovoImovel />} />
             <Route path="/gastos" element={<GastosMensais />} />

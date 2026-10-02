@@ -5,7 +5,7 @@ import { ImovelCard } from '../components/ImovelCard'
 import { RankingTable } from '../components/RankingTable'
 import { getImoveis, reavaliarTodosImoveis } from '../services/imoveisService'
 
-export function Listagem() {
+export function ListagemImoveis() {
   const [imoveis, setImoveis] = useState([])
   const [loading, setLoading] = useState(true)
   const [modoVisualizacao, setModoVisualizacao] = useState('cards')

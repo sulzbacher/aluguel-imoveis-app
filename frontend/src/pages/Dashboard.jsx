@@ -173,7 +173,7 @@ export function Dashboard() {
             <Award className="w-4 h-4 text-amber-400" /> Líderes do Ranking de Imóveis
           </span>
           <Link
-            to="/ranking"
+            to="/imoveis"
             className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1"
           >
             Ver Ranking Completo <ArrowRight className="w-3.5 h-3.5" />

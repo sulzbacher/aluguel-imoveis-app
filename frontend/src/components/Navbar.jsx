@@ -37,15 +37,15 @@ export function Navbar() {
           </Link>
 
           <Link
-            to="/ranking"
+            to="/imoveis"
             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition ${
-              isActive('/ranking')
+              isActive('/imoveis')
                 ? 'bg-indigo-950/80 text-indigo-300 border border-indigo-700/50'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
             }`}
           >
             <Building2 className="w-4 h-4" />
-            <span>Ranking Imóveis</span>
+            <span>Imóveis</span>
           </Link>
 
           <Link
