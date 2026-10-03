@@ -24,6 +24,7 @@ backend/data/historico_pagamentos.json
 backend/data/google_tokens.json
 backend/data/dieta_mercado.json
 backend/data/cofres_metas.json
+backend/data/faturas_cartoes.json
 
 # Arquivos de sistema
 .DS_Store
