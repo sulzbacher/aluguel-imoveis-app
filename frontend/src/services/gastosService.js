@@ -1,38 +1,17 @@
-import api from './api'
+import { apiRequest } from './api.js'
 
-// Rotas de Gastos
-export const getGastosERendas = async () => {
-  const res = await api.get('/gastos')
-  return res.data
-}
+export const getGastosERendas = () => apiRequest({ method: 'get', url: '/gastos' })
 
-export const createGasto = async gastoData => {
-  const res = await api.post('/gastos', gastoData)
-  return res.data
-}
+export const createGasto = gastoData => apiRequest({ method: 'post', url: '/gastos', data: gastoData })
 
-export const deleteGasto = async id => {
-  const res = await api.delete(`/gastos/${id}`)
-  return res.data
-}
+export const deleteGasto = id => apiRequest({ method: 'delete', url: `/gastos/${id}` })
 
-export const createRenda = async (pessoa, rendaData) => {
-  const res = await api.post(`/gastos/renda/${pessoa}`, rendaData)
-  return res.data
-}
+export const createRenda = (pessoa, rendaData) =>
+  apiRequest({ method: 'post', url: `/gastos/renda/${pessoa}`, data: rendaData })
 
-export const deleteRenda = async (pessoa, id) => {
-  const res = await api.delete(`/gastos/renda/${pessoa}/${id}`)
-  return res.data
-}
+export const deleteRenda = (pessoa, id) => apiRequest({ method: 'delete', url: `/gastos/renda/${pessoa}/${id}` })
 
-//Rotas pagamentos
-export const getHistoricoGastosMes = async mesAno => {
-  const res = await api.get(`/gastos/historico/${mesAno}`)
-  return res.data
-}
+export const getHistoricoGastosMes = mesAno => apiRequest({ method: 'get', url: `/gastos/historico/${mesAno}` })
 
-export const toggleMarcarPago = async dados => {
-  const res = await api.post('/gastos/historico/marcar-pago', dados)
-  return res.data
-}
+export const toggleMarcarPago = dados =>
+  apiRequest({ method: 'post', url: '/gastos/historico/marcar-pago', data: dados })

@@ -1,37 +1,15 @@
 import express from 'express'
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import {
+  lerDadosCartoes,
+  salvarDadosCartoes,
+  sincronizarComGastosMensais,
+} from '../services/cartoes/cartoesService.js'
 
 const router = express.Router()
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
-const cartoesPath = path.join(__dirname, '../../data/cartoes_credito.json')
-const gastosPath = path.join(__dirname, '../../data/gastos_mensais.json')
-
-function lerJSON(caminho, padrao) {
-  try {
-    if (fs.existsSync(caminho)) {
-      return JSON.parse(fs.readFileSync(caminho, 'utf8'))
-    }
-  } catch (err) {
-    console.error(`Erro ao ler ${caminho}:`, err)
-  }
-  return padrao
-}
-
-function salvarJSON(caminho, dados) {
-  try {
-    fs.writeFileSync(caminho, JSON.stringify(dados, null, 2), 'utf8')
-  } catch (err) {
-    console.error(`Erro ao salvar ${caminho}:`, err)
-  }
-}
 
 // GET: Retorna cartões, compras e resumo de faturas/limite usado
 router.get('/', (req, res) => {
-  const data = lerJSON(cartoesPath, { cartoes: [], compras: [] })
+  const data = lerDadosCartoes()
 
   // Processa a fatura de cada cartão e o limite disponível
   const cartoesComFatura = data.cartoes.map(cartao => {
@@ -72,12 +50,12 @@ router.get('/', (req, res) => {
 router.put('/:id/limite', (req, res) => {
   const { id } = req.params
   const { limite } = req.body
-  const data = lerJSON(cartoesPath, { cartoes: [], compras: [] })
+  const data = lerDadosCartoes()
 
   const cartao = data.cartoes.find(c => c.id === id)
   if (cartao) {
     cartao.limite = Number(limite || 0)
-    salvarJSON(cartoesPath, data)
+    salvarDadosCartoes(data)
   }
 
   res.json({ message: 'Limite atualizado com sucesso!' })
@@ -86,7 +64,7 @@ router.put('/:id/limite', (req, res) => {
 // POST: Adicionar nova compra / assinatura parcelada
 router.post('/compra', (req, res) => {
   const { cartao_id, descricao, categoria, valor_total, parcelas_totais, tipo, valor_parcela } = req.body
-  const data = lerJSON(cartoesPath, { cartoes: [], compras: [] })
+  const data = lerDadosCartoes()
 
   const numParcelas = Number(parcelas_totais || 1)
   const total = Number(valor_total || 0)
@@ -105,7 +83,7 @@ router.post('/compra', (req, res) => {
   }
 
   data.compras.push(novaCompra)
-  salvarJSON(cartoesPath, data)
+  salvarDadosCartoes(data)
 
   // Sincroniza faturas com a planilha de gastos
   sincronizarComGastosMensais()
@@ -116,44 +94,13 @@ router.post('/compra', (req, res) => {
 // DELETE: Remover uma compra do cartão
 router.delete('/compra/:id', (req, res) => {
   const { id } = req.params
-  const data = lerJSON(cartoesPath, { cartoes: [], compras: [] })
+  const data = lerDadosCartoes()
 
   data.compras = data.compras.filter(c => c.id !== id)
-  salvarJSON(cartoesPath, data)
+  salvarDadosCartoes(data)
 
   sincronizarComGastosMensais()
   res.json({ message: 'Compra removida com sucesso!' })
 })
-
-// Função auxiliar: Sincroniza a fatura dos cartões com o gastos_mensais.json
-export function sincronizarComGastosMensais() {
-  const dataCartoes = lerJSON(cartoesPath, { cartoes: [], compras: [] })
-  const gastos = lerJSON(gastosPath, [])
-
-  // Calcula fatura atual de cada cartão
-  const faturaCaixa = dataCartoes.compras
-    .filter(c => c.cartao_id === 'cartao_caixa_mulher')
-    .reduce((a, b) => a + Number(b.valor_parcela || 0), 0)
-
-  const faturaNeon = dataCartoes.compras
-    .filter(c => c.cartao_id === 'cartao_neon_neno')
-    .reduce((a, b) => a + Number(b.valor_parcela || 0), 0)
-
-  const faturaNubank = dataCartoes.compras
-    .filter(c => c.cartao_id === 'cartao_nubank_neno')
-    .reduce((a, b) => a + Number(b.valor_parcela || 0), 0)
-
-  // Atualiza no gastos_mensais.json se o item existir
-  const gCaixa = gastos.find(g => /caixa mulher/i.test(g.descricao))
-  if (gCaixa) gCaixa.valor = faturaCaixa
-
-  const gNeon = gastos.find(g => /neon/i.test(g.descricao))
-  if (gNeon) gNeon.valor = faturaNeon
-
-  const gNubank = gastos.find(g => /nubank/i.test(g.descricao))
-  if (gNubank) gNubank.valor = faturaNubank
-
-  salvarJSON(gastosPath, gastos)
-}
 
 export default router

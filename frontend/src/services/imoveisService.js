@@ -1,37 +1,15 @@
-import api from './api'
+import { apiRequest } from './api.js'
 
-// Rotas de Imóveis
-export const getImoveis = async () => {
-  const res = await api.get('/imoveis')
-  return res.data
-}
+export const getImoveis = () => apiRequest({ method: 'get', url: '/imoveis' })
 
-export const getImovel = async id => {
-  const res = await api.get(`/imoveis/${id}`)
-  return res.data
-}
+export const getImovel = id => apiRequest({ method: 'get', url: `/imoveis/${id}` })
 
-export const createImovel = async data => {
-  const res = await api.post('/imoveis', data)
-  return res.data
-}
+export const createImovel = data => apiRequest({ method: 'post', url: '/imoveis', data })
 
-export const updateImovel = async (id, data) => {
-  const res = await api.put(`/imoveis/${id}`, data)
-  return res.data
-}
+export const updateImovel = (id, data) => apiRequest({ method: 'put', url: `/imoveis/${id}`, data })
 
-export const deleteImovel = async id => {
-  const res = await api.delete(`/imoveis/${id}`)
-  return res.data
-}
+export const deleteImovel = id => apiRequest({ method: 'delete', url: `/imoveis/${id}` })
 
-export const reavaliarImovel = async id => {
-  const res = await api.post(`/imoveis/${id}/reavaliar`)
-  return res.data
-}
+export const reavaliarImovel = id => apiRequest({ method: 'post', url: `/imoveis/${id}/reavaliar` })
 
-export const reavaliarTodosImoveis = async () => {
-  const res = await api.post('/imoveis/reavaliar-todos')
-  return res.data
-}
+export const reavaliarTodosImoveis = () => apiRequest({ method: 'post', url: '/imoveis/reavaliar-todos' })

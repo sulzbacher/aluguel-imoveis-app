@@ -2,8 +2,8 @@ import { Router } from 'express'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { analisarEndereco } from '../services/geocoding.js'
-import { calcularScoreImovel } from '../services/score.js'
+import { analisarEndereco } from '../services/imoveis/geocoding.js'
+import { calcularScoreImovel } from '../services/imoveis/score.js'
 
 const router = Router()
 const __filename = fileURLToPath(import.meta.url)

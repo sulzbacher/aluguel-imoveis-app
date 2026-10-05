@@ -2,6 +2,7 @@ import express from 'express'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { sincronizarComGastosMensais } from '../services/cartoes/cartoesService.js'
 
 const router = express.Router()
 const __filename = fileURLToPath(import.meta.url)
@@ -10,8 +11,6 @@ const __dirname = path.dirname(__filename)
 const gastosPath = path.join(__dirname, '../../data/gastos_mensais.json')
 const rendaPath = path.join(__dirname, '../../data/renda_casal.json')
 const historicoPath = path.join(__dirname, '../../data/historico_pagamentos.json')
-
-import { sincronizarComGastosMensais } from './cartoes.js'
 
 function lerJSON(caminho, padrao) {
   try {

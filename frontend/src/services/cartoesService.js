@@ -1,22 +1,10 @@
-import api from './api'
+import { apiRequest } from './api.js'
 
-// Rotas de Cartões
-export const getCartoes = async () => {
-  const res = await api.get('/cartoes')
-  return res.data
-}
+export const getCartoes = () => apiRequest({ method: 'get', url: '/cartoes' })
 
-export const updateLimiteCartao = async (cartaoId, limite) => {
-  const res = await api.put(`/cartoes/${cartaoId}/limite`, { limite })
-  return res.data
-}
+export const updateLimiteCartao = (cartaoId, limite) =>
+  apiRequest({ method: 'put', url: `/cartoes/${cartaoId}/limite`, data: { limite } })
 
-export const createCompra = async compraData => {
-  const res = await api.post('/cartoes/compra', compraData)
-  return res.data
-}
+export const createCompra = compraData => apiRequest({ method: 'post', url: '/cartoes/compra', data: compraData })
 
-export const deleteCompra = async id => {
-  const res = await api.delete(`/cartoes/compra/${id}`)
-  return res.data
-}
+export const deleteCompra = id => apiRequest({ method: 'delete', url: `/cartoes/compra/${id}` })

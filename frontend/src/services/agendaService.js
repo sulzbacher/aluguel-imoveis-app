@@ -1,32 +1,16 @@
-import api from './api'
+import { apiRequest } from './api.js'
 
-//Rotas Agenda
-export const getAuthUrlGoogle = async () => {
-  const res = await api.get('/agenda/auth-url')
-  return res.data
-}
+export const getAuthUrlGoogle = () => apiRequest({ method: 'get', url: '/agenda/auth-url' })
 
-export const getCalendariosAgenda = async () => {
-  const res = await api.get('/agenda/calendarios')
-  return res.data
-}
+export const getCalendariosAgenda = () => apiRequest({ method: 'get', url: '/agenda/calendarios' })
 
-export const getEventosAgenda = async (calendarId = 'primary') => {
-  const res = await api.get(`/agenda/eventos?calendarId=${encodeURIComponent(calendarId)}`)
-  return res.data
-}
+export const getEventosAgenda = (calendarId = 'primary') =>
+  apiRequest({ method: 'get', url: '/agenda/eventos', params: { calendarId } })
 
-export const createEventoAgenda = async evento => {
-  const res = await api.post('/agenda/eventos', evento)
-  return res.data
-}
+export const createEventoAgenda = evento => apiRequest({ method: 'post', url: '/agenda/eventos', data: evento })
 
-export const updateEventoAgenda = async (id, evento) => {
-  const res = await api.put(`/agenda/eventos/${id}`, evento)
-  return res.data
-}
+export const updateEventoAgenda = (id, evento, calendarId = 'primary') =>
+  apiRequest({ method: 'put', url: `/agenda/eventos/${id}`, data: { ...evento, calendarId }, params: { calendarId } })
 
-export const deleteEventoAgenda = async (id, calendarId = 'primary') => {
-  const res = await api.delete(`/agenda/eventos/${id}?calendarId=${encodeURIComponent(calendarId)}`)
-  return res.data
-}
+export const deleteEventoAgenda = (id, calendarId = 'primary') =>
+  apiRequest({ method: 'delete', url: `/agenda/eventos/${id}`, params: { calendarId } })
