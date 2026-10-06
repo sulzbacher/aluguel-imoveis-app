@@ -34,6 +34,30 @@ export function getMesFaturaAtual(data = new Date()) {
   return `01-${mes}-${ano}`
 }
 
+export function normalizarMesKey(mes) {
+  if (!mes) return getMesFaturaAtual()
+
+  if (/^\d{4}-\d{2}$/.test(mes)) {
+    const [ano, mesNumero] = mes.split('-')
+    return `01-${mesNumero}-${ano}`
+  }
+
+  if (/^\d{2}-\d{2}-\d{4}$/.test(mes)) {
+    return mes
+  }
+
+  return getMesFaturaAtual()
+}
+
+export function paraMesAno(mesKey) {
+  const chave = normalizarMesKey(mesKey)
+  const match = /^\d{2}-(\d{2})-(\d{4})$/.exec(chave)
+  if (!match) return getMesFaturaAtual()
+
+  const [, mes, ano] = match
+  return `${ano}-${mes}`
+}
+
 function parseMesFaturaKey(chave) {
   const match = /^\d{2}-\d{2}-\d{4}$/.exec(chave || '')
   if (!match) return null
@@ -50,6 +74,17 @@ export function getMesFaturaMaisRecente(faturas = lerDadosFaturas()) {
   }
 
   return chaves.sort((a, b) => parseMesFaturaKey(b) - parseMesFaturaKey(a))[0]
+}
+
+export function getMesesDisponiveisFaturas() {
+  const faturas = lerDadosFaturas()
+  const meses = Object.keys(faturas || {})
+    .map(normalizarMesKey)
+    .filter(Boolean)
+    .sort((a, b) => parseMesFaturaKey(b) - parseMesFaturaKey(a))
+    .map(chave => paraMesAno(chave))
+
+  return [...new Set(meses)]
 }
 
 export function lerDadosCartoes() {

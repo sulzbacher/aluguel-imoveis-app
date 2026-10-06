@@ -1,11 +1,17 @@
-import { ArrowLeft, Check, CreditCard, Edit2, Plus, ShoppingBag, Trash2 } from 'lucide-react'
+import { ArrowLeft, Calendar, Check, CreditCard, Edit2, Plus, ShoppingBag, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { createCompra, deleteCompra, getCartoes, updateLimiteCartao } from '../services/cartoesService'
 
 export function Cartoes() {
-  const [data, setData] = useState({ cartoes: [], totalFaturasGeral: 0 })
+  const [data, setData] = useState({
+    cartoes: [],
+    totalFaturasGeral: 0,
+    mesAtual: '2026-10',
+    mesesDisponiveis: ['2026-10'],
+  })
   const [loading, setLoading] = useState(true)
+  const [mesSelecionado, setMesSelecionado] = useState('2026-10')
   const [editandoLimiteId, setEditandoLimiteId] = useState(null)
   const [novoLimiteInput, setNovoLimiteInput] = useState('')
 
@@ -20,13 +26,21 @@ export function Cartoes() {
   })
 
   useEffect(() => {
-    carregar()
-  }, [])
+    carregar(mesSelecionado)
+  }, [mesSelecionado])
 
-  const carregar = async () => {
+  const carregar = async mes => {
     try {
-      const res = await getCartoes()
-      setData(res)
+      const res = await getCartoes(mes)
+      const nextMes = res.mesAtual || mes || '2026-10'
+
+      setData({
+        cartoes: res.cartoes || [],
+        totalFaturasGeral: Number(res.totalFaturasGeral || 0),
+        mesAtual: nextMes,
+        mesesDisponiveis: res.mesesDisponiveis || [nextMes],
+      })
+      setMesSelecionado(nextMes)
     } catch (err) {
       console.error(err)
     } finally {
@@ -38,7 +52,7 @@ export function Cartoes() {
     try {
       await updateLimiteCartao(cartaoId, Number(novoLimiteInput))
       setEditandoLimiteId(null)
-      carregar()
+      carregar(mesSelecionado)
     } catch (err) {
       alert(`Erro ao atualizar limite: ${err.message}`)
     }
@@ -51,6 +65,7 @@ export function Cartoes() {
     try {
       await createCompra({
         ...form,
+        mes: mesSelecionado,
         valor_total: Number(form.valor_total),
         parcelas_totais: Number(form.parcelas_totais),
       })
@@ -62,7 +77,7 @@ export function Cartoes() {
         parcelas_totais: '1',
         tipo: 'Parcelado',
       })
-      carregar()
+      carregar(mesSelecionado)
     } catch (err) {
       alert(`Erro: ${err.message}`)
     }
@@ -70,8 +85,8 @@ export function Cartoes() {
 
   const handleDeleteCompra = async id => {
     if (confirm('Remover esta compra do cartão?')) {
-      await deleteCompra(id)
-      carregar()
+      await deleteCompra(id, mesSelecionado)
+      carregar(mesSelecionado)
     }
   }
 
@@ -95,11 +110,28 @@ export function Cartoes() {
           </p>
         </div>
 
-        <div className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-700/80 text-right">
-          <span className="text-[10px] text-slate-400 font-semibold uppercase block">Total Faturas do Mês</span>
-          <span className="text-xl font-black text-rose-400">
-            R$ {(data.totalFaturasGeral || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-          </span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-slate-900 border border-slate-700/80 p-2 rounded-xl">
+            <Calendar className="w-4 h-4 text-indigo-400 ml-1" />
+            <select
+              value={mesSelecionado}
+              onChange={e => setMesSelecionado(e.target.value)}
+              className="bg-transparent text-sm font-bold text-slate-100 focus:outline-none cursor-pointer"
+            >
+              {(data.mesesDisponiveis || ['2026-10']).map(mes => (
+                <option key={mes} value={mes} className="bg-slate-900 text-slate-100">
+                  Mês: {mes}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-700/80 text-right">
+            <span className="text-[10px] text-slate-400 font-semibold uppercase block">Total Faturas do Mês</span>
+            <span className="text-xl font-black text-rose-400">
+              R$ {(data.totalFaturasGeral || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            </span>
+          </div>
         </div>
       </div>
 

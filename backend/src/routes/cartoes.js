@@ -1,13 +1,23 @@
 import express from 'express'
-import { lerDadosCartoes, lerComprasDoMes, salvarComprasDoMes, salvarDadosCartoes, sincronizarComGastosMensais } from '../services/cartoes/cartoesService.js'
+import {
+  getMesesDisponiveisFaturas,
+  lerComprasDoMes,
+  lerDadosCartoes,
+  normalizarMesKey,
+  paraMesAno,
+  salvarComprasDoMes,
+  salvarDadosCartoes,
+  sincronizarComGastosMensais,
+} from '../services/cartoes/cartoesService.js'
 
 const router = express.Router()
 
 // GET: Retorna cartões, compras e resumo de faturas/limite usado
 router.get('/', (req, res) => {
+  const mesSelecionado = normalizarMesKey(req.query.mes)
   const data = lerDadosCartoes()
   const cartoes = Array.isArray(data?.cartoes) ? data.cartoes : []
-  const compras = lerComprasDoMes()
+  const compras = lerComprasDoMes(mesSelecionado)
 
   const cartoesComFatura = cartoes.map(cartao => {
     const comprasDoCartao = compras.filter(c => c.cartao_id === cartao.id)
@@ -38,6 +48,8 @@ router.get('/', (req, res) => {
   res.json({
     cartoes: cartoesComFatura,
     totalFaturasGeral: parseFloat(totalFaturasGeral.toFixed(2)),
+    mesAtual: paraMesAno(mesSelecionado),
+    mesesDisponiveis: getMesesDisponiveisFaturas(),
   })
 })
 
@@ -58,8 +70,9 @@ router.put('/:id/limite', (req, res) => {
 
 // POST: Adicionar nova compra / assinatura parcelada
 router.post('/compra', (req, res) => {
-  const { cartao_id, descricao, categoria, valor_total, parcelas_totais, tipo, valor_parcela } = req.body
-  const compras = lerComprasDoMes()
+  const { cartao_id, descricao, categoria, valor_total, parcelas_totais, tipo, valor_parcela, mes } = req.body
+  const mesSelecionado = normalizarMesKey(mes)
+  const compras = lerComprasDoMes(mesSelecionado)
 
   const numParcelas = Number(parcelas_totais || 1)
   const total = Number(valor_total || 0)
@@ -78,7 +91,7 @@ router.post('/compra', (req, res) => {
   }
 
   compras.push(novaCompra)
-  salvarComprasDoMes(compras)
+  salvarComprasDoMes(compras, mesSelecionado)
 
   sincronizarComGastosMensais()
 
@@ -88,9 +101,11 @@ router.post('/compra', (req, res) => {
 // DELETE: Remover uma compra do cartão
 router.delete('/compra/:id', (req, res) => {
   const { id } = req.params
-  const compras = lerComprasDoMes().filter(c => c.id !== id)
+  const { mes } = req.query
+  const mesSelecionado = normalizarMesKey(mes)
+  const compras = lerComprasDoMes(mesSelecionado).filter(c => c.id !== id)
 
-  salvarComprasDoMes(compras)
+  salvarComprasDoMes(compras, mesSelecionado)
 
   sincronizarComGastosMensais()
   res.json({ message: 'Compra removida com sucesso!' })
