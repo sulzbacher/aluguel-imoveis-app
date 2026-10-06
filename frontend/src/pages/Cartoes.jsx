@@ -106,7 +106,11 @@ export function Cartoes() {
       {/* CARDS DOS 3 CARTÕES DE CRÉDITO */}
       <div className="grid md:grid-cols-3 gap-6">
         {data.cartoes?.map(c => {
-          const percentualUso = c.limite > 0 ? Math.min(100, Math.round((c.limiteComprometido / c.limite) * 100)) : 0
+          const limite = Number(c.limite || 0)
+          const faturaAtual = Number(c.faturaAtual || 0)
+          const limiteComprometido = Number(c.limiteComprometido || 0)
+          const limiteDisponivel = Number(c.limiteDisponivel || 0)
+          const percentualUso = limite > 0 ? Math.min(100, Math.round((limiteComprometido / limite) * 100)) : 0
 
           return (
             <div
@@ -120,7 +124,7 @@ export function Cartoes() {
                     <span className="text-[10px] text-slate-400">Titular: {c.titular}</span>
                   </div>
                   <span className="bg-indigo-950/80 text-indigo-300 border border-indigo-700/40 text-[10px] font-bold px-2 py-0.5 rounded">
-                    Fatura: R$ {c.faturaAtual.toLocaleString('pt-BR')}
+                    Fatura: R$ {faturaAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </span>
                 </div>
 
@@ -145,7 +149,7 @@ export function Cartoes() {
                       </div>
                     ) : (
                       <span className="font-bold text-slate-200 flex items-center gap-1">
-                        R$ {Number(c.limite || 0).toLocaleString('pt-BR')}
+                        R$ {limite.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         <button
                           onClick={() => {
                             setEditandoLimiteId(c.id)
@@ -161,7 +165,9 @@ export function Cartoes() {
 
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-slate-400">Limite Disponível:</span>
-                    <span className="font-bold text-emerald-400">R$ {c.limiteDisponivel.toLocaleString('pt-BR')}</span>
+                    <span className="font-bold text-emerald-400">
+                      R$ {limiteDisponivel.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </span>
                   </div>
 
                   {/* Barra de Progresso do Limite */}

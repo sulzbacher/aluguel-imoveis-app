@@ -134,7 +134,10 @@ export function Dashboard() {
 
             <div className="grid sm:grid-cols-3 gap-3">
               {cartoesData.cartoes?.map(c => {
-                const perc = c.limite > 0 ? Math.min(100, Math.round((c.limiteComprometido / c.limite) * 100)) : 0
+                const limite = Number(c.limite || 0)
+                const faturaAtual = Number(c.faturaAtual || 0)
+                const limiteComprometido = Number(c.limiteComprometido || 0)
+                const perc = limite > 0 ? Math.min(100, Math.round((limiteComprometido / limite) * 100)) : 0
                 return (
                   <div key={c.id} className="bg-slate-900/80 p-3 rounded-xl border border-slate-700/50 space-y-2">
                     <div className="flex justify-between items-center">
@@ -142,7 +145,7 @@ export function Dashboard() {
                       <span className="text-[10px] text-slate-400">{c.titular}</span>
                     </div>
                     <p className="text-base font-black text-rose-400">
-                      R$ {c.faturaAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      R$ {faturaAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </p>
                     <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
                       <div

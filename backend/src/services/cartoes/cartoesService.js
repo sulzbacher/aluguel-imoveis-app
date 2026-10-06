@@ -7,6 +7,7 @@ const __dirname = path.dirname(__filename)
 
 const cartoesPath = path.join(__dirname, '../../../data/cartoes_credito.json')
 const gastosPath = path.join(__dirname, '../../../data/gastos_mensais.json')
+const faturasPath = path.join(__dirname, '../../../data/faturas_cartoes.json')
 
 export function lerJSON(caminho, padrao) {
   try {
@@ -27,27 +28,86 @@ export function salvarJSON(caminho, dados) {
   }
 }
 
+export function getMesFaturaAtual(data = new Date()) {
+  const mes = String(data.getMonth() + 1).padStart(2, '0')
+  const ano = data.getFullYear()
+  return `01-${mes}-${ano}`
+}
+
+function parseMesFaturaKey(chave) {
+  const match = /^\d{2}-\d{2}-\d{4}$/.exec(chave || '')
+  if (!match) return null
+
+  const [dia, mes, ano] = chave.split('-')
+  return new Date(Number(ano), Number(mes) - 1, Number(dia))
+}
+
+export function getMesFaturaMaisRecente(faturas = lerDadosFaturas()) {
+  const chaves = Object.keys(faturas || {}).filter(chave => parseMesFaturaKey(chave))
+
+  if (!chaves.length) {
+    return getMesFaturaAtual()
+  }
+
+  return chaves.sort((a, b) => parseMesFaturaKey(b) - parseMesFaturaKey(a))[0]
+}
+
 export function lerDadosCartoes() {
-  return lerJSON(cartoesPath, { cartoes: [], compras: [] })
+  const dados = lerJSON(cartoesPath, { cartoes: [] })
+
+  return {
+    ...(dados || {}),
+    cartoes: Array.isArray(dados?.cartoes) ? dados.cartoes : [],
+  }
 }
 
 export function salvarDadosCartoes(dados) {
-  salvarJSON(cartoesPath, dados)
+  const payload = {
+    ...(dados || {}),
+    cartoes: Array.isArray(dados?.cartoes) ? dados.cartoes : [],
+  }
+
+  salvarJSON(cartoesPath, payload)
+}
+
+export function lerDadosFaturas() {
+  const dados = lerJSON(faturasPath, {})
+  return dados && typeof dados === 'object' ? dados : {}
+}
+
+export function lerComprasDoMes(mesKey = getMesFaturaAtual()) {
+  const faturas = lerDadosFaturas()
+  const chaveDisponivel = faturas?.[mesKey] ? mesKey : getMesFaturaMaisRecente(faturas)
+  const mes = faturas?.[chaveDisponivel] || {}
+  return Array.isArray(mes.compras) ? mes.compras : []
+}
+
+export function salvarComprasDoMes(compras, mesKey = getMesFaturaAtual()) {
+  const faturas = lerDadosFaturas()
+  const payloadCompras = Array.isArray(compras) ? compras : []
+
+  faturas[mesKey] = {
+    ...(faturas[mesKey] || {}),
+    compras: payloadCompras,
+  }
+
+  salvarJSON(faturasPath, faturas)
+  return payloadCompras
 }
 
 export function sincronizarComGastosMensais() {
-  const dataCartoes = lerDadosCartoes()
   const gastos = lerJSON(gastosPath, [])
+  const compras = lerComprasDoMes()
 
-  const faturaCaixa = dataCartoes.compras
+  const faturaCaixa = compras
     .filter(c => c.cartao_id === 'cartao_caixa_mulher')
     .reduce((a, b) => a + Number(b.valor_parcela || 0), 0)
 
-  const faturaNeon = dataCartoes.compras
+  const faturaNeon = compras
     .filter(c => c.cartao_id === 'cartao_neon_neno')
     .reduce((a, b) => a + Number(b.valor_parcela || 0), 0)
 
-  const faturaNubank = dataCartoes.compras
+  const faturaNubank = compras
     .filter(c => c.cartao_id === 'cartao_nubank_neno')
     .reduce((a, b) => a + Number(b.valor_parcela || 0), 0)
 
@@ -64,12 +124,13 @@ export function sincronizarComGastosMensais() {
 }
 
 export function fecharEAvancarFaturaCartao(cartaoId, mesPago) {
-  const cartoes = lerDadosCartoes()
-  const cartao = cartoes.find(c => c.id === cartaoId)
-
+  const cartao = lerDadosCartoes().cartoes.find(c => c.id === cartaoId)
   if (!cartao) return
 
-  const comprasAtuais = cartao.compras || []
+  const mesKey = mesPago || getMesFaturaAtual()
+  const faturas = lerDadosFaturas()
+  const comprasMes = Array.isArray(faturas?.[mesKey]?.compras) ? faturas[mesKey].compras : []
+  const comprasAtuais = comprasMes.filter(compra => compra.cartao_id === cartaoId)
   const novasCompras = []
 
   comprasAtuais.forEach(compra => {
@@ -85,20 +146,28 @@ export function fecharEAvancarFaturaCartao(cartaoId, mesPago) {
     }
   })
 
-  cartao.compras = novasCompras
+  const comprasRestantes = comprasMes.filter(compra => compra.cartao_id !== cartaoId)
+  faturas[mesKey] = {
+    ...(faturas[mesKey] || {}),
+    compras: [...comprasRestantes, ...novasCompras],
+  }
 
   const novaFatura = novasCompras.reduce((acc, c) => acc + Number(c.valorParcela || c.valor || 0), 0)
-  cartao.faturaAtual = parseFloat(novaFatura.toFixed(2))
-
   const totalComprometido = novasCompras.reduce((acc, c) => {
     const parcelasRestantes = (c.totalParcelas || 1) - (c.parcelaAtual - 1)
     return acc + Number(c.valorParcela || c.valor) * parcelasRestantes
   }, 0)
 
+  salvartFaturas(faturas)
+  cartao.faturaAtual = parseFloat(novaFatura.toFixed(2))
   cartao.limiteComprometido = parseFloat(totalComprometido.toFixed(2))
   cartao.limiteDisponivel = parseFloat((Number(cartao.limite || 0) - totalComprometido).toFixed(2))
 
-  salvarDadosCartoes(cartoes)
+  salvarDadosCartoes({ cartoes: lerDadosCartoes().cartoes })
+}
+
+function salvartFaturas(faturas) {
+  salvarJSON(faturasPath, faturas)
 }
 
 export function processarViradaFatura(

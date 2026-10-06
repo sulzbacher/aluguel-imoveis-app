@@ -1,24 +1,19 @@
 import express from 'express'
-import {
-  lerDadosCartoes,
-  salvarDadosCartoes,
-  sincronizarComGastosMensais,
-} from '../services/cartoes/cartoesService.js'
+import { lerDadosCartoes, lerComprasDoMes, salvarComprasDoMes, salvarDadosCartoes, sincronizarComGastosMensais } from '../services/cartoes/cartoesService.js'
 
 const router = express.Router()
 
 // GET: Retorna cartões, compras e resumo de faturas/limite usado
 router.get('/', (req, res) => {
   const data = lerDadosCartoes()
+  const cartoes = Array.isArray(data?.cartoes) ? data.cartoes : []
+  const compras = lerComprasDoMes()
 
-  // Processa a fatura de cada cartão e o limite disponível
-  const cartoesComFatura = data.cartoes.map(cartao => {
-    const comprasDoCartao = data.compras.filter(c => c.cartao_id === cartao.id)
+  const cartoesComFatura = cartoes.map(cartao => {
+    const comprasDoCartao = compras.filter(c => c.cartao_id === cartao.id)
 
-    // Fatura mensal atual (Soma das parcelas ativas + assinaturas)
     const faturaAtual = comprasDoCartao.reduce((acc, c) => acc + Number(c.valor_parcela || 0), 0)
 
-    // Total comprometido das compras parceladas no limite
     const limiteComprometido = comprasDoCartao.reduce((acc, c) => {
       if (c.tipo === 'Parcelado') {
         const parcelasRestantes = Number(c.parcelas_totais) - Number(c.parcela_atual) + 1
@@ -52,7 +47,7 @@ router.put('/:id/limite', (req, res) => {
   const { limite } = req.body
   const data = lerDadosCartoes()
 
-  const cartao = data.cartoes.find(c => c.id === id)
+  const cartao = (data.cartoes || []).find(c => c.id === id)
   if (cartao) {
     cartao.limite = Number(limite || 0)
     salvarDadosCartoes(data)
@@ -64,7 +59,7 @@ router.put('/:id/limite', (req, res) => {
 // POST: Adicionar nova compra / assinatura parcelada
 router.post('/compra', (req, res) => {
   const { cartao_id, descricao, categoria, valor_total, parcelas_totais, tipo, valor_parcela } = req.body
-  const data = lerDadosCartoes()
+  const compras = lerComprasDoMes()
 
   const numParcelas = Number(parcelas_totais || 1)
   const total = Number(valor_total || 0)
@@ -82,10 +77,9 @@ router.post('/compra', (req, res) => {
     tipo: tipo || 'Parcelado',
   }
 
-  data.compras.push(novaCompra)
-  salvarDadosCartoes(data)
+  compras.push(novaCompra)
+  salvarComprasDoMes(compras)
 
-  // Sincroniza faturas com a planilha de gastos
   sincronizarComGastosMensais()
 
   res.status(201).json(novaCompra)
@@ -94,10 +88,9 @@ router.post('/compra', (req, res) => {
 // DELETE: Remover uma compra do cartão
 router.delete('/compra/:id', (req, res) => {
   const { id } = req.params
-  const data = lerDadosCartoes()
+  const compras = lerComprasDoMes().filter(c => c.id !== id)
 
-  data.compras = data.compras.filter(c => c.id !== id)
-  salvarDadosCartoes(data)
+  salvarComprasDoMes(compras)
 
   sincronizarComGastosMensais()
   res.json({ message: 'Compra removida com sucesso!' })

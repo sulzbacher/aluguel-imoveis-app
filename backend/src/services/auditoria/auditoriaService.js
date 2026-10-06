@@ -17,13 +17,17 @@ function lerJSON(relPath, padrao) {
 
 export function auditarSistema() {
   const gastosMestre = lerJSON('gastos_mensais.json', [])
-  const cartoes = lerJSON('cartoes_credito.json', [])
+  const cartoes = lerJSON('cartoes_credito.json', { cartoes: [] })
+  const faturas = lerJSON('faturas_cartoes.json', {})
   const renda = lerJSON('renda_casal.json', { carol: { entradas: [] }, neno: { entradas_variaveis: [] } })
   const imoveis = lerJSON('imoveis.json', [])
   const historico = lerJSON('historico_pagamentos.json', {})
 
   const divergencias = []
   const alertas = []
+
+  const comprasMensais = Object.values(faturas)
+    .flatMap(mes => Array.isArray(mes?.compras) ? mes.compras : [])
 
   // 1. Renda Total do Casal
   const rendaCarol = (renda.carol?.entradas || []).reduce((acc, e) => acc + Number(e.valor || 0), 0)
@@ -36,8 +40,10 @@ export function auditarSistema() {
     .reduce((acc, g) => acc + Number(g.valor || 0), 0)
 
   // 3. Auditoria de Cartões de Crédito vs Planilha
-  cartoes.compras.forEach(cartao => {
-    const faturaCalculada = (cartao.compras || []).reduce((acc, c) => acc + Number(c.valorParcela || c.valor || 0), 0)
+  (cartoes.cartoes || []).forEach(cartao => {
+    const faturaCalculada = comprasMensais
+      .filter(c => c.cartao_id === cartao.id)
+      .reduce((acc, c) => acc + Number(c.valor_parcela || c.valor_total || c.valor || 0), 0)
     const itemNaPlanilha = gastosMestre.find(g => new RegExp(cartao.nome, 'i').test(g.descricao))
 
     if (itemNaPlanilha && Number(itemNaPlanilha.valor) !== parseFloat(faturaCalculada.toFixed(2))) {
